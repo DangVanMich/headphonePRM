@@ -24,7 +24,7 @@
             android:name=".ui.auth.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".login"
+            android:name=".ui.auth.LoginActivity"
             android:exported="false" />
         <activity
             android:name=".controller.ProfileActivity"

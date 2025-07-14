@@ -32,10 +32,6 @@ android {
     buildFeatures {
         viewBinding = true
     }
-
-    dependencies {
-        implementation files('libs/mysql-connector-java-8.x.xx.jar') // Replace with your jar name
-    }
 }
 
 dependencies {

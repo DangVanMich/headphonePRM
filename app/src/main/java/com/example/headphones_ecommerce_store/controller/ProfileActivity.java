@@ -9,12 +9,13 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.headphones_ecommerce_store.R;
+import com.example.headphones_ecommerce_store.ui.auth.LoginActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class ProfileActivity extends AppCompatActivity {
 
     BottomNavigationView bottomNav;
-    LinearLayout optionPersonalInfo, optionOrderHistory;
+    LinearLayout optionPersonalInfo, optionOrderHistory, optionLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +42,16 @@ public class ProfileActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        optionLogout = findViewById(R.id.optionLogout);
+        optionLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
+
 
 
     }

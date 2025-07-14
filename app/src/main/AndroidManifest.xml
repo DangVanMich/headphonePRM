@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -25,7 +27,16 @@
             android:name=".login"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".controller.ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".controller.ProfileDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".controller.OrderHistoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".controller.MainHomeActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Headphonesecommercestore.NoActionBar">

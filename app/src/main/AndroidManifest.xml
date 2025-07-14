@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -15,13 +15,13 @@
         android:theme="@style/Theme.Headphonesecommercestore"
         tools:targetApi="31">
         <activity
-            android:name=".ChangePassword"
+            android:name=".ui.auth.ChangePassword"
             android:exported="false" />
         <activity
-            android:name=".PasswordForgotActivity"
+            android:name=".ui.auth.PasswordForgotActivity"
             android:exported="false" />
         <activity
-            android:name=".RegisterActivity"
+            android:name=".ui.auth.RegisterActivity"
             android:exported="false" />
         <activity
             android:name=".login"

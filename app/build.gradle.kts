@@ -32,6 +32,10 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+    dependencies {
+        implementation files('libs/mysql-connector-java-8.x.xx.jar') // Replace with your jar name
+    }
 }
 
 dependencies {
@@ -44,6 +48,8 @@ dependencies {
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.activity)
+    implementation(libs.androidx.navigation.fragment)
+    implementation(libs.androidx.navigation.ui)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

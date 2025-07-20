@@ -11,6 +11,8 @@ public class User {
     private List<Address> shippingAddresses;
     private List<PaymentMethod> paymentMethods;
     private List<String> orderHistory; // List of Order IDs
+    private String password;
+
 
     public User() {
         this.shippingAddresses = new ArrayList<>(); // Initialize lists
@@ -46,4 +48,12 @@ public class User {
     public void setShippingAddresses(List<Address> shippingAddresses) { this.shippingAddresses = shippingAddresses; }
     public void setPaymentMethods(List<PaymentMethod> paymentMethods) { this.paymentMethods = paymentMethods; }
     public void setOrderHistory(List<String> orderHistory) { this.orderHistory = orderHistory; }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

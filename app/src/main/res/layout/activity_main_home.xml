@@ -133,14 +133,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tabLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:tabMode="scrollable"
-                app:tabIndicatorColor="#000"
-                app:tabSelectedTextColor="#000" />
-
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/viewPagerRanking"
                 android:layout_width="match_parent"
@@ -162,4 +154,14 @@
         app:itemTextColor="@color/nav_item_color"
         app:labelVisibilityMode="labeled"
         />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_anchor="@+id/bottomNavigationView"
+        app:layout_anchorGravity="top|center"
+        app:tabIndicatorColor="#000"
+        app:tabMode="scrollable"
+        app:tabSelectedTextColor="#000" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

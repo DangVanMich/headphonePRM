@@ -6,12 +6,15 @@ import java.util.Map;
 // import android.os.Parcelable; // For Parcelable
 
 public class Product /* implements Parcelable */ { // Implement Parcelable if needed
-    private String id;
+    private long id;
     private String name;
     private String brand;
     private String description;
     private double price;
     private List<String> imageUrls;
+
+    private String thumbnailImageUrl;
+
     private String category;
     private List<String> features;
     private List<String> colorOptions;
@@ -25,7 +28,15 @@ public class Product /* implements Parcelable */ { // Implement Parcelable if ne
         // Default constructor for libraries like Firebase Firestore or Gson
     }
 
-    public Product(String id, String name, String brand, String description, double price,
+    public String getThumbnailImageUrl() {
+        return thumbnailImageUrl;
+    }
+
+    public void setThumbnailImageUrl(String thumbnailImageUrl) {
+        this.thumbnailImageUrl = thumbnailImageUrl;
+    }
+
+    public Product(long id, String name, String brand, String description, double price,
                    List<String> imageUrls, String category, List<String> features,
                    List<String> colorOptions, int stockQuantity, float averageRating,
                    int reviewCount, Map<String, String> specifications) {
@@ -44,8 +55,16 @@ public class Product /* implements Parcelable */ { // Implement Parcelable if ne
         this.specifications = specifications;
     }
 
+    public Product(long id, String name, String description, double price, String thumbnailImageUrl) {
+        this.id = id;
+        this.name = name;
+        this.thumbnailImageUrl = thumbnailImageUrl;
+        this.description = description;
+        this.price = price;
+    }
+
     // Getters
-    public String getId() { return id; }
+    public long getId() { return id; }
     public String getName() { return name; }
     public String getBrand() { return brand; }
     public String getDescription() { return description; }
@@ -60,7 +79,7 @@ public class Product /* implements Parcelable */ { // Implement Parcelable if ne
     public Map<String, String> getSpecifications() { return specifications; }
 
     // Setters
-    public void setId(String id) { this.id = id; }
+    public void setId(long id) { this.id = id; }
     public void setName(String name) { this.name = name; }
     public void setBrand(String brand) { this.brand = brand; }
     public void setDescription(String description) { this.description = description; }

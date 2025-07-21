@@ -32,12 +32,17 @@
             android:orientation="vertical"
             android:padding="16dp"
             android:gravity="center_horizontal">
+
+            <!--<====BẮt đầu sửa====>-->
+            <!-- Sửa scaleType để hiển thị toàn bộ ảnh -->
             <ImageView
                 android:id="@+id/ivDetailProductImage"
                 android:layout_width="250dp"
                 android:layout_height="350dp"
-                android:scaleType="centerCrop"
+                android:scaleType="fitCenter"
                 tools:srcCompat="@tools:sample/avatars" />
+            <!-- <====Kết thúc sửa====>-->
+
             <TextView
                 android:id="@+id/tvDetailProductName"
                 android:layout_width="wrap_content"
@@ -95,7 +100,6 @@
         android:orientation="horizontal"
         android:padding="12dp"
         android:gravity="center_vertical">
-
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -122,9 +126,6 @@
                 android:layout_height="28dp"
                 android:src="@drawable/ic_add"/>
         </LinearLayout>
-
-        <!--<====BẮt đầu sửa====>-->
-        <!-- Thay thế TextView bằng ImageView cho icon giỏ hàng -->
         <ImageView
             android:id="@+id/ivAddToCart"
             android:layout_width="0dp"
@@ -132,18 +133,16 @@
             android:layout_height="32dp"
             android:src="@drawable/ic_shopping_cart"
             android:contentDescription="Add to cart"/>
-        <!-- <====Kết thúc sửa====>-->
 
-        <!-- Nút Mua ngay -->
         <Button
             android:id="@+id/btnBuyNow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/pink_button_background"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp"
             android:text="Mua ngay"
+            android:background="@drawable/pink_button_background"
+            app:backgroundTint="@null"
             android:textColor="@android:color/black"
-            android:visibility="visible" />
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"/>
     </LinearLayout>
 </RelativeLayout>

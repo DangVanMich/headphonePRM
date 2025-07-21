@@ -1,6 +1,7 @@
 package com.example.headphones_ecommerce_store.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,13 +20,19 @@ import java.util.List;
 public class RankingItemAdapter extends RecyclerView.Adapter<RankingItemAdapter.ViewHolder> {
     private final List<RankingItem> itemList;
     private final Context context;
+    private OnItemClickListener listener;
 
-    public RankingItemAdapter(Context context, List<RankingItem> itemList) {
-        this.context = context;
-        this.itemList = itemList;
+    public interface OnItemClickListener {
+        void onItemClick(RankingItem item);
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public RankingItemAdapter(Context context, List<RankingItem> itemList, OnItemClickListener listener) {
+        this.context = context;
+        this.itemList = itemList;
+        this.listener = listener;
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imgProduct;
         TextView txtName, txtPrice;
 
@@ -34,6 +41,14 @@ public class RankingItemAdapter extends RecyclerView.Adapter<RankingItemAdapter.
             imgProduct = itemView.findViewById(R.id.imgProduct);
             txtName = itemView.findViewById(R.id.txtProductName);
             txtPrice = itemView.findViewById(R.id.txtProductPrice);
+            itemView.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (listener != null && position != RecyclerView.NO_POSITION) {
+                    Log.d("AdapterClick", "RankingAdapter: Item clicked at position " + position);
+                    listener.onItemClick(itemList.get(position));
+                }
+            });
+
         }
     }
 

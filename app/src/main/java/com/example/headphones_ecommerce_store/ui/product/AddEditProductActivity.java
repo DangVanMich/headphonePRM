@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
@@ -34,6 +35,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 
 public class AddEditProductActivity extends AppCompatActivity {
@@ -106,14 +111,25 @@ public class AddEditProductActivity extends AppCompatActivity {
         binding.etProductName.setText(product.getName());
         binding.etProductDescription.setText(product.getDescription());
         binding.etProductPrice.setText(String.valueOf(product.getPrice()));
-//        binding.etProductImageUrl.setText(product.getImageUrl());
+        binding.etProductCategory.setText(product.getCategory());
+        binding.etProductStockQuantity.setText(String.valueOf(product.getStockQuantity()));
+
+        if(product.getFeatures() != null && !product.getFeatures().isEmpty()) {
+            binding.etProductFeatures.setText(TextUtils.join(", ", product.getFeatures()));
+        }
+
+        if(product.getColorOptions() != null && !product.getColorOptions().isEmpty()) {
+            binding.etProductColorOptions.setText(TextUtils.join(", ", product.getColorOptions()));
+        }
+
+        binding.etProductBrand.setText(product.getBrand());
     }
 
     private void saveProduct(){
         String name = binding.etProductName.getText().toString().trim();
         String description = binding.etProductDescription.getText().toString().trim();
+        String brand = binding.etProductBrand.getText().toString().trim();
         String priceStr = binding.etProductPrice.getText().toString().trim();
-//        String imageUrl = binding.etProductImageUrl.getText().toString().trim();
         String imagePathToSave = currentImagePath;
 
         if (name.isEmpty() || description.isEmpty() || priceStr.isEmpty()) {
@@ -121,7 +137,37 @@ public class AddEditProductActivity extends AppCompatActivity {
             return;
         }
 
-        double price = Double.parseDouble(priceStr);
+        double price = 0.0;
+        try {
+            price = Double.parseDouble(binding.etProductPrice.getText().toString());
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Invalid price", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String category = binding.etProductCategory.getText().toString().trim();
+
+        int stockQuantity = 0;
+
+        try {
+            stockQuantity = Integer.parseInt(binding.etProductStockQuantity.getText().toString());
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Invalid stock", Toast.LENGTH_SHORT).show();
+        }
+
+        String featureString = binding.etProductFeatures.getText().toString().trim();
+
+        List<String> featureList = TextUtils.isEmpty(featureString) ?
+                Collections.emptyList() :
+                new ArrayList<>(Arrays.asList(featureString.split("\\s*,\\s*")));
+
+        String colorOptionsString = binding.etProductColorOptions.getText().toString().trim();
+
+        List<String> colorOptionsList = TextUtils.isEmpty(colorOptionsString) ?
+                Collections.emptyList() :
+                new ArrayList<>(Arrays.asList(colorOptionsString.split("\\s*,\\s*")));
+
+
 
 
         if (selectedImageUri != null) {
@@ -149,11 +195,23 @@ public class AddEditProductActivity extends AppCompatActivity {
         }
 
         boolean success;
+        Product product = new Product();
+
+        product.setName(name);
+        product.setDescription(description);
+        product.setBrand(brand);
+        product.setPrice(price);
+        product.setCategory(category);
+        product.setStockQuantity(stockQuantity);
+        product.setFeatures(featureList);
+        product.setColorOptions(colorOptionsList);
+        product.setThumbnailImageUrl(imagePathToSave);
 
         if (productId == -1) {
-            success = db.addProduct(name, description, price, imagePathToSave);
+            success = db.addProduct(product);
         } else {
-            success = db.updateProduct(productId, name, description, price, imagePathToSave);
+            product.setId(productId);
+            success = db.updateProduct(product);
         }
 
         if (success) {

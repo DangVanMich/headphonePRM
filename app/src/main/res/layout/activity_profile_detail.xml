@@ -29,6 +29,7 @@
             android:padding="24dp">
 
             <ImageView
+                android:id="@+id/ivProfileImage"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:src="@drawable/ic_placeholder"
@@ -36,6 +37,7 @@
                 android:padding="8dp" />
 
             <TextView
+                android:id="@+id/tvNameHeader"
                 android:text="Duc Viet"
                 android:textSize="20sp"
                 android:textStyle="bold"
@@ -45,6 +47,7 @@
                 android:layout_height="wrap_content"/>
 
             <TextView
+                android:id="@+id/tvLocationHeader"
                 android:text="Viet Nam"
                 android:textColor="#FFF"
                 android:layout_width="wrap_content"
@@ -69,14 +72,46 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <TextView android:text="Name: Duc Viet" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-            <TextView android:text="Gender: Male" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-            <TextView android:text="Date of Birth: 01/01/2000" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-            <TextView android:text="Age: 25" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-            <TextView android:text="Address: 123 Main St, DaNang, Vietnam" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-            <TextView android:text="Phone: +84 123 456 789" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-            <TextView android:text="Email: duc.viet@example.com" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-            <TextView android:text="Registered since: 01/01/2023" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/tvName"
+                android:text="Name: Duc Viet"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/tvGender"
+                android:text="Gender: Male"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/tvDob"
+                android:text="Date of Birth: 01/01/2000"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/tvAge"
+                android:text="Age: 25"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/tvAddress"
+                android:text="Address: 123 Main St, DaNang, Vietnam"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/tvPhone"
+                android:text="Phone: +84 123 456 789"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/tvEmail"
+                android:text="Email: duc.viet@example.com"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/tvRegisteredSince"
+                android:text="Registered since: 01/01/2023"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:text="Vị trí của bạn"

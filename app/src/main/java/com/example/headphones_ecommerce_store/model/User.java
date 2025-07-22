@@ -56,4 +56,9 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    // In User.java
+    public String getRegistrationDate() {
+        return null; // Implement getter if registration_date is added as a field
+    }
 }

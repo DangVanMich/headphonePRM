@@ -37,6 +37,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class MainHomeActivity extends AppCompatActivity {
 
@@ -53,6 +54,7 @@ public class MainHomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_home);
 
+        BottomNavHelper.setupBottomNav(this, R.id.menu_home);
         rvHeadphones = findViewById(R.id.rvHeadphones);
         rvHeadphones.setLayoutManager(new LinearLayoutManager(this));
         searchEditText = findViewById(R.id.searchEditText);
@@ -67,27 +69,22 @@ public class MainHomeActivity extends AppCompatActivity {
         productList = new ArrayList<>();
 
         //test list khi add product ko đủ dữ liệu
-        productList.add(new Product(
-                1, "Sony WH-1000XM5", "Sony", "Tai nghe chống ồn đỉnh cao, pin 30 giờ", 399.99, "https://m.media-amazon.com/images/I/61bK6PMOC3L._AC_SL1500_.jpg", 4.5f
-        ));
+        productList.add(new Product(1, "Sony WH-1000XM5", "Sony", "Tai nghe chống ồn đỉnh cao, pin 30 giờ", 399.99, "https://m.media-amazon.com/images/I/61bK6PMOC3L._AC_SL1500_.jpg", 4.5f));
+        productList.add(new Product(2, "AirPods Max", "Apple", "Âm thanh không gian, thiết kế cao cấp", 549.00, "https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/airpods-max-select-silver-202011?wid=2000&hei=2000", 4.2f));
+        productList.add(new Product(3, "Jabra Elite 85h", "Jabra", "Chống ồn chủ động, kết nối đa thiết bị", 199.99, "https://m.media-amazon.com/images/I/81XQy2L7WXL._AC_SL1500_.jpg", 2.2f));
+        productList.add(new Product(4, "Jabra Elite 85h", "Jabra", "Chống ồn chủ động, kết nối đa thiết bị", 199.99, "https://m.media-amazon.com/images/I/81XQy2L7WXL._AC_SL1500_.jpg", 3.5f));
 
-        productList.add(new Product(
-                2, "AirPods Max", "Apple", "Âm thanh không gian, thiết kế cao cấp", 549.00, "https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/airpods-max-select-silver-202011?wid=2000&hei=2000", 4.2f
-        ));
-
-        productList.add(new Product(
-                3, "Jabra Elite 85h", "Jabra", "Chống ồn chủ động, kết nối đa thiết bị", 199.99, "https://m.media-amazon.com/images/I/81XQy2L7WXL._AC_SL1500_.jpg", 2.2f
-        ));
-        productList.add(new Product(
-                4, "Jabra Elite 85h", "Jabra", "Chống ồn chủ động, kết nối đa thiết bị", 199.99, "https://m.media-amazon.com/images/I/81XQy2L7WXL._AC_SL1500_.jpg", 3.5f
-        ));
-        // if chạy đúng nhưng 1 hàng bị null là lỗi
+         //if chạy đúng nhưng 1 hàng bị null là lỗi
 //        if (cursor != null && cursor.moveToFirst()) {
 //            do {
 //                Product product = new Product();
 //                product.setId(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_PRODUCT_ID)));
 //                product.setName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRODUCT_NAME)));
+//
 //                product.setBrand(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRODUCT_BRAND)));
+////                product.setBrand(Objects.requireNonNullElse(
+////                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRODUCT_BRAND)), "All"));
+//
 //                product.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRODUCT_DESC)));
 //                product.setPrice(cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_PRODUCT_PRICE)));
 //                product.setThumbnailImageUrl(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRODUCT_THUMBNAIL_IMAGE_URL)));
@@ -153,28 +150,6 @@ public class MainHomeActivity extends AppCompatActivity {
                 bannerViewPager.postDelayed(this, 5000);
             }
         }, 5000);
-
-        // Bottom Navigation
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
-        bottomNav.setSelectedItemId(R.id.menu_home);
-
-        bottomNav.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.menu_home) {
-                return true;
-            } else if (itemId == R.id.menu_profile) {
-                Intent intent = new Intent(MainHomeActivity.this, ProfileActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
-                return true;
-            }else if (itemId == R.id.menu_map) {
-                Intent intent = new Intent(MainHomeActivity.this, AddEditProductActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
-                return true;
-            }
-            return false;
-        });
     }
     private void applyFilter(String keyword, String brand) {
         filteredProducts.clear();

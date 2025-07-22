@@ -148,32 +148,19 @@
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/viewPagerRanking"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="200dp"
                 android:layout_marginTop="8dp" />
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@color/white"
+                app:tabIndicatorColor="#000"
+                app:tabMode="scrollable"
+                app:tabSelectedTextColor="#000" />
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom Navigation cố định -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigationView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:elevation="0dp"
-        android:background="@color/white"
-        app:menu="@menu/bottom_nav_menu"
-        app:itemIconTint="@color/nav_item_color"
-        app:itemTextColor="@color/nav_item_color"
-        app:labelVisibilityMode="labeled"
-        />
-
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_anchor="@+id/bottomNavigationView"
-        app:layout_anchorGravity="top|center"
-        app:tabIndicatorColor="#000"
-        app:tabMode="scrollable"
-        app:tabSelectedTextColor="#000" />
+    <include layout="@layout/layout_bottom_nav" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

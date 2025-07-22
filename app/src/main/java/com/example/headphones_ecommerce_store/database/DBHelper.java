@@ -62,6 +62,12 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_SPECIFICATION_KEY = "spec_key";
     public static final String COLUMN_SPECIFICATION_VALUE = "spec_value";
 
+    //Cart Table
+    public static final String TABLE_CART = "cart";
+    public static final String COLUMN_CART_ID = "id";
+    public static final String COLUMN_CART_PRODUCT_ID = "product_id";
+    public static final String COLUMN_CART_QUANTITY = "quantity";
+
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -131,6 +137,15 @@ public class DBHelper extends SQLiteOpenHelper {
                 + ")";
         db.execSQL(CREATE_TABLE_PRODUCT_SPECIFICATIONS);
 
+        //Cart Table
+        String CREATE_TABLE_CART = "CREATE TABLE " + TABLE_CART + "("
+                + COLUMN_CART_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + COLUMN_CART_PRODUCT_ID + " INTEGER,"
+                + COLUMN_CART_QUANTITY + " INTEGER,"
+                + "FOREIGN KEY (" + COLUMN_CART_PRODUCT_ID + ") REFERENCES " + TABLE_PRODUCTS + "(" + COLUMN_PRODUCT_ID + ")"
+                + ")";
+        db.execSQL(CREATE_TABLE_CART);
+
     }
 
 
@@ -145,6 +160,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PRODUCT_IMAGE_URLS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PRODUCTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CART);
         onCreate(db);
     }
 }

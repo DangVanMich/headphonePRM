@@ -19,6 +19,7 @@
 
             <!-- Chào người dùng -->
             <TextView
+                android:id="@+id/tvGreeting"
                 android:text="Chào, Nguyễn Văn A"
                 android:textStyle="bold"
                 android:textSize="18sp"
@@ -152,8 +153,7 @@
         app:menu="@menu/bottom_nav_menu"
         app:itemIconTint="@color/nav_item_color"
         app:itemTextColor="@color/nav_item_color"
-        app:labelVisibilityMode="labeled"
-        />
+        app:labelVisibilityMode="labeled" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"

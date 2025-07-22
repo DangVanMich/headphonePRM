@@ -12,53 +12,54 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.headphones_ecommerce_store.R;
-import com.example.headphones_ecommerce_store.models.RankingItem;
+import com.example.headphones_ecommerce_store.model.Product;
 
 import java.util.List;
 
-public class RankingItemAdapter extends RecyclerView.Adapter<RankingItemAdapter.ViewHolder> {
-    private final List<RankingItem> itemList;
+public class RankingProductAdapter extends RecyclerView.Adapter<RankingProductAdapter.ViewHolder> {
+    private final List<Product> productList;
     private final Context context;
 
-    public RankingItemAdapter(Context context, List<RankingItem> itemList) {
+    public RankingProductAdapter(Context context, List<Product> productList) {
         this.context = context;
-        this.itemList = itemList;
+        this.productList = productList;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imgProduct;
-        TextView txtName, txtPrice;
+        TextView txtName, txtPrice, txtRating;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             imgProduct = itemView.findViewById(R.id.imgProduct);
             txtName = itemView.findViewById(R.id.txtProductName);
             txtPrice = itemView.findViewById(R.id.txtProductPrice);
+            txtRating = itemView.findViewById(R.id.txtProductRating);
         }
     }
 
     @NonNull
     @Override
-    public RankingItemAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RankingProductAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_ranking, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RankingItemAdapter.ViewHolder holder, int position) {
-        RankingItem item = itemList.get(position);
-        holder.txtName.setText((position + 1) + ". " + item.getName());
-        holder.txtPrice.setText("$" + item.getPrice());
+    public void onBindViewHolder(@NonNull RankingProductAdapter.ViewHolder holder, int position) {
+        Product p = productList.get(position);
+        holder.txtName.setText((position + 1) + ". " + p.getName());
+        holder.txtPrice.setText(String.format("$%.2f", p.getPrice()));
+        holder.txtRating.setText(String.format("★ %.1f", p.getAverageRating()));
 
         Glide.with(context)
-                .load(item.getImageUrl())
+                .load(p.getThumbnailImageUrl())
                 .placeholder(R.drawable.ic_placeholder)
                 .into(holder.imgProduct);
     }
 
     @Override
     public int getItemCount() {
-        return itemList.size();
+        return productList.size();
     }
 }
-

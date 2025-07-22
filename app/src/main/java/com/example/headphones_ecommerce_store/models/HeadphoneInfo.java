@@ -1,6 +1,6 @@
 package com.example.headphones_ecommerce_store.models;
 import java.io.Serializable;
-
+//Không dùng nữa
 public class HeadphoneInfo implements Serializable {
     private long id;
     private String name;

@@ -1,78 +1,77 @@
 package com.example.headphones_ecommerce_store.adapters;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.headphones_ecommerce_store.R;
-import com.example.headphones_ecommerce_store.models.HeadphoneInfo;
+import com.example.headphones_ecommerce_store.model.Product;
 
 import java.util.List;
 
-public class HeadphoneAdapter extends RecyclerView.Adapter<HeadphoneAdapter.ViewHolder> {
-    private List<HeadphoneInfo> headphoneList;
-    private Context context;
-    private OnItemClickListener listener;
+public class HeadphoneAdapter extends RecyclerView.Adapter<HeadphoneAdapter.HeadphoneViewHolder> {
 
     public interface OnItemClickListener {
-        void onItemClick(HeadphoneInfo headphone);
+        void onItemClick(Product product);
     }
 
-    public HeadphoneAdapter(Context context, List<HeadphoneInfo> headphoneList, OnItemClickListener listener) {
+    private Context context;
+    private List<Product> productList;
+    private OnItemClickListener listener;
+
+    public HeadphoneAdapter(Context context, List<Product> productList, OnItemClickListener listener) {
         this.context = context;
-        this.headphoneList = headphoneList;
+        this.productList = productList;
         this.listener = listener;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView img;
-        TextView name, brand, price;
-
-        public ViewHolder(View itemView) {
-            super(itemView);
-            img = itemView.findViewById(R.id.imgHeadphone);
-            name = itemView.findViewById(R.id.txtName);
-            brand = itemView.findViewById(R.id.txtBrand);
-            price = itemView.findViewById(R.id.txtPrice);
-            itemView.setOnClickListener(v -> {
-                int position = getAdapterPosition();
-                if (listener != null && position != RecyclerView.NO_POSITION) {
-                    Log.d("AdapterClick", "HeadphoneAdapter: Item clicked at position " + position);
-                    listener.onItemClick(headphoneList.get(position));
-                }
-            });
-
-        }
+    @NonNull
+    @Override
+    public HeadphoneViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.item_headphone, parent, false);
+        return new HeadphoneViewHolder(view);
     }
 
     @Override
-    public HeadphoneAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_headphone, parent, false);
-        return new ViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(HeadphoneAdapter.ViewHolder holder, int position) {
-        HeadphoneInfo item = headphoneList.get(position);
-        holder.name.setText(item.getName());
-        holder.brand.setText(item.getBrand());
-        holder.price.setText("$" + item.getPrice());
-
-        Glide.with(context)
-                .load(item.getImageUrl())
-                .into(holder.img);
+    public void onBindViewHolder(@NonNull HeadphoneViewHolder holder, int position) {
+        Product product = productList.get(position);
+        holder.bind(product, listener);
     }
 
     @Override
     public int getItemCount() {
-        return headphoneList.size();
+        return productList.size();
+    }
+
+    static class HeadphoneViewHolder extends RecyclerView.ViewHolder {
+        ImageView imgHeadphone;
+        TextView txtName, txtBrand, txtPrice;
+
+        public HeadphoneViewHolder(@NonNull View itemView) {
+            super(itemView);
+            imgHeadphone = itemView.findViewById(R.id.imgHeadphone);
+            txtName = itemView.findViewById(R.id.txtName);
+            txtBrand = itemView.findViewById(R.id.txtBrand);
+            txtPrice = itemView.findViewById(R.id.txtPrice);
+        }
+
+        public void bind(Product product, OnItemClickListener listener) {
+            txtName.setText(product.getName());
+            txtBrand.setText(product.getBrand() != null ? product.getBrand() : "No brand");
+            txtPrice.setText(String.format("$%.2f", product.getPrice()));
+
+            Glide.with(itemView.getContext())
+                    .load(product.getThumbnailImageUrl())
+                    .into(imgHeadphone);
+
+            itemView.setOnClickListener(v -> listener.onItemClick(product));
+        }
     }
 }
-

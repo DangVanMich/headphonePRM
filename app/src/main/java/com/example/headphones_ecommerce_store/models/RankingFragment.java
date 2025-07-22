@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,18 +12,22 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.headphones_ecommerce_store.R;
-import com.example.headphones_ecommerce_store.adapters.RankingItemAdapter;
+import com.example.headphones_ecommerce_store.adapters.RankingProductAdapter;
+import com.example.headphones_ecommerce_store.model.Product;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RankingFragment extends Fragment {
     private static final String ARG_CATEGORY = "category";
 
-    public static RankingFragment newInstance(String category) {
+    public static RankingFragment newInstance(String category, List<Product> productList) {
         RankingFragment fragment = new RankingFragment();
         Bundle args = new Bundle();
         args.putString(ARG_CATEGORY, category);
+        args.putSerializable("allProducts", new ArrayList<>(productList));
         fragment.setArguments(args);
         return fragment;
     }
@@ -38,28 +41,17 @@ public class RankingFragment extends Fragment {
         RecyclerView recyclerView = view.findViewById(R.id.rvRanking);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        List<RankingItem> items = new ArrayList<>();
+        List<Product> allProducts = (List<Product>) getArguments().getSerializable("allProducts");
         String category = getArguments().getString(ARG_CATEGORY, "");
 
-        // Demo cứng theo category
-        if (category.equals("Sony")) {
-            items.add(new RankingItem("WH-1000XM5", "https://m.media-amazon.com/images/I/61bK6PMOC3L._AC_SL1500_.jpg", 399.99));
-            items.add(new RankingItem("WH-CH720N", "https://m.media-amazon.com/images/I/71YzjlYCHbL._AC_SL1500_.jpg", 129.99));
-            items.add(new RankingItem("WH-XB910N", "https://m.media-amazon.com/images/I/71XCLbF22vL._AC_SL1500_.jpg", 199.00));
-        }
-        if (category.equals("Apple")) {
-            items.add(new RankingItem("WH-1000XM5", "https://m.media-amazon.com/images/I/61bK6PMOC3L._AC_SL1500_.jpg", 399.99));
-            items.add(new RankingItem("WH-CH720N", "https://m.media-amazon.com/images/I/71YzjlYCHbL._AC_SL1500_.jpg", 129.99));
-            items.add(new RankingItem("WH-XB910N", "https://m.media-amazon.com/images/I/71XCLbF22vL._AC_SL1500_.jpg", 199.00));
-        }
-        if (category.equals("Jabra")) {
-            items.add(new RankingItem("WH-1000XM5", "https://m.media-amazon.com/images/I/61bK6PMOC3L._AC_SL1500_.jpg", 399.99));
-            items.add(new RankingItem("WH-CH720N", "https://m.media-amazon.com/images/I/71YzjlYCHbL._AC_SL1500_.jpg", 129.99));
-            items.add(new RankingItem("WH-XB910N", "https://m.media-amazon.com/images/I/71XCLbF22vL._AC_SL1500_.jpg", 199.00));
-        }
-        // ... Apple, Jabra, etc.
+        List<Product> filteredTop3 = allProducts.stream()
+                .filter(p -> p.getBrand().equalsIgnoreCase(category))
+                .sorted(Comparator.comparingDouble(Product::getAverageRating).reversed())
+                .limit(3)
+                .collect(Collectors.toList());
 
-        RankingItemAdapter adapter = new RankingItemAdapter(getContext(), items);
+
+        RankingProductAdapter adapter = new RankingProductAdapter(getContext(), filteredTop3);
         recyclerView.setAdapter(adapter);
 
         return view;

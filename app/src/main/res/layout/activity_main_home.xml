@@ -44,6 +44,7 @@
                     android:src="@android:drawable/ic_menu_search" />
 
                 <EditText
+                    android:id="@+id/searchEditText"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
@@ -78,17 +79,28 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
-                    <Button android:text="Sony" style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="wrap_content"
+                    <Button
+                        android:id="@+id/btnAll"
+                        android:text="All"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="70dp"
                         android:layout_height="wrap_content" />
-                    <Button android:text="Apple" style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="wrap_content"
+                    <Button android:id="@+id/btnSony"
+                        android:text="Sony" style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="70dp"
                         android:layout_height="wrap_content" />
-                    <Button android:text="Jabra" style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="wrap_content"
+                    <Button android:id="@+id/btnApple"
+                        android:text="Apple" style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="70dp"
                         android:layout_height="wrap_content" />
-                    <Button android:text="Anker" style="@style/Widget.MaterialComponents.Button.TextButton"
-                        android:layout_width="wrap_content"
+                    <Button android:id="@+id/btnJabra"
+                        android:text="Jabra" style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content" />
+                    <Button
+                        android:id="@+id/btnAnker"
+                        android:text="Anker" style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="70dp"
                         android:layout_height="wrap_content" />
                 </LinearLayout>
             </HorizontalScrollView>
@@ -109,7 +121,7 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:text="Tai nghe nổi bật"
+                        android:text="Danh mục sản phẩm"
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:textColor="#000"
@@ -119,7 +131,7 @@
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rvHeadphones"
                         android:layout_width="match_parent"
-                        android:layout_height="160dp"
+                        android:layout_height="320dp"
                         android:layout_marginTop="8dp"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>

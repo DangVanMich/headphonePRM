@@ -68,6 +68,21 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_CART_PRODUCT_ID = "product_id";
     public static final String COLUMN_CART_QUANTITY = "quantity";
 
+    // Orders Table
+    public static final String TABLE_ORDERS = "orders";
+    public static final String COLUMN_ORDER_ID = "order_id";
+    public static final String COLUMN_ORDER_DATE = "order_date";
+    public static final String COLUMN_ORDER_TOTAL = "total_amount";
+    public static final String COLUMN_ORDER_STATUS = "status";
+
+    // Order Items Table
+    public static final String TABLE_ORDER_ITEMS = "order_items";
+    public static final String COLUMN_ORDER_ITEM_ID = "item_id";
+    public static final String COLUMN_ORDER_ITEM_ORDER_ID = "order_id";
+    public static final String COLUMN_ORDER_ITEM_PRODUCT_NAME = "product_name";
+    public static final String COLUMN_ORDER_ITEM_QUANTITY = "quantity";
+    public static final String COLUMN_ORDER_ITEM_PRICE = "price";
+
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -146,6 +161,23 @@ public class DBHelper extends SQLiteOpenHelper {
                 + ")";
         db.execSQL(CREATE_TABLE_CART);
 
+        String CREATE_TABLE_ORDERS = "CREATE TABLE " + TABLE_ORDERS + "("
+                + COLUMN_ORDER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + COLUMN_ORDER_DATE + " TEXT,"
+                + COLUMN_ORDER_TOTAL + " REAL,"
+                + COLUMN_ORDER_STATUS + " TEXT" + ")";
+        db.execSQL(CREATE_TABLE_ORDERS);
+
+        String CREATE_TABLE_ORDER_ITEMS = "CREATE TABLE " + TABLE_ORDER_ITEMS + "("
+                + COLUMN_ORDER_ITEM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + COLUMN_ORDER_ITEM_ORDER_ID + " INTEGER,"
+                + COLUMN_ORDER_ITEM_PRODUCT_NAME + " TEXT,"
+                + COLUMN_ORDER_ITEM_QUANTITY + " INTEGER,"
+                + COLUMN_ORDER_ITEM_PRICE + " REAL,"
+                + "FOREIGN KEY (" + COLUMN_ORDER_ITEM_ORDER_ID + ") REFERENCES " + TABLE_ORDERS + "(" + COLUMN_ORDER_ID + ")"
+                + ")";
+        db.execSQL(CREATE_TABLE_ORDER_ITEMS);
+
 
     }
 
@@ -159,6 +191,8 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PRODUCT_IMAGE_URLS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PRODUCTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER_ITEMS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDERS);
         onCreate(db);
     }
 

@@ -22,6 +22,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
     private Context context;
     private CartItemListener listener;
 
+    // Interface để gửi sự kiện ra Activity
     public interface CartItemListener {
         void onQuantityChanged(CartItem item);
         void onItemDeleted(CartItem item, int position);
@@ -79,14 +80,43 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
             Glide.with(context).load(item.getImageUrl()).into(ivCartProductImage);
 
+            // Bỏ listener cũ để tránh gọi 2 lần, chỉ xử lý khi người dùng nhấn
+            cbSelectItem.setOnCheckedChangeListener(null);
+            cbSelectItem.setChecked(item.isSelected());
             cbSelectItem.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                item.setSelected(isChecked);
-                listener.onItemSelectionChanged();
+                if (buttonView.isPressed()) {
+                    item.setSelected(isChecked);
+                    listener.onItemSelectionChanged();
+                }
             });
 
-            ivCartPlus.setOnClickListener(v -> { /* ... logic cũ ... */ });
-            ivCartMinus.setOnClickListener(v -> { /* ... logic cũ ... */ });
-            ivDeleteItem.setOnClickListener(v -> { /* ... logic cũ ... */ });
+            // Sự kiện tăng số lượng
+            ivCartPlus.setOnClickListener(v -> {
+                int quantity = item.getQuantity();
+                quantity++;
+                item.setQuantity(quantity);
+                tvCartQuantity.setText(String.valueOf(quantity));
+                listener.onQuantityChanged(item);
+            });
+
+            // Sự kiện giảm số lượng
+            ivCartMinus.setOnClickListener(v -> {
+                int quantity = item.getQuantity();
+                if (quantity > 1) {
+                    quantity--;
+                    item.setQuantity(quantity);
+                    tvCartQuantity.setText(String.valueOf(quantity));
+                    listener.onQuantityChanged(item);
+                }
+            });
+
+            // Sự kiện xóa sản phẩm
+            ivDeleteItem.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    listener.onItemDeleted(cartItemList.get(position), position);
+                }
+            });
         }
     }
 }

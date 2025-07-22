@@ -277,4 +277,13 @@ public class ProductDAO extends DBHelper {
         return product;
     }
 
+    public int getProductsCount() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String countQuery = "SELECT * FROM " + TABLE_PRODUCTS;
+        Cursor cursor = db.rawQuery(countQuery, null);
+        int count = cursor.getCount();
+        cursor.close();
+        return count;
+    }
+
 }

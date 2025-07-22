@@ -34,7 +34,8 @@
             android:exported="false" />
         <activity
             android:name=".controller.OrderHistoryActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.Headphonesecommercestore.NoActionBar" />
         <activity
             android:name=".ui.product.ProductListActivity"
             android:exported="false" />
@@ -47,6 +48,10 @@
             android:theme="@style/Theme.Headphonesecommercestore.NoActionBar" />
         <activity
             android:name=".controller.CartActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Headphonesecommercestore.NoActionBar" />
+        <activity
+            android:name=".controller.PaymentSuccessActivity"
             android:exported="false"
             android:theme="@style/Theme.Headphonesecommercestore.NoActionBar" />
         <activity

@@ -63,9 +63,13 @@ public class RankingFragment extends Fragment {
         // ... Apple, Jabra, etc.
 
         RankingItemAdapter adapter = new RankingItemAdapter(getContext(), items, item -> {
+            Log.d("FragmentClick", "RankingFragment: Clicked on " + item.getName() + " with ID: " + item.getId());
+
             Intent intent = new Intent(getActivity(), ProductDetailActivity.class);
-            HeadphoneInfo headphoneToSend = new HeadphoneInfo(item.getId(), item.getName(), category, item.getPrice(), item.getImageUrl());
-            intent.putExtra(ProductDetailActivity.EXTRA_PRODUCT_OBJECT, headphoneToSend);
+
+            // Chỉ gửi ID của sản phẩm
+            intent.putExtra(ProductDetailActivity.EXTRA_PRODUCT_ID, item.getId());
+
             startActivity(intent);
         });
         recyclerView.setAdapter(adapter);

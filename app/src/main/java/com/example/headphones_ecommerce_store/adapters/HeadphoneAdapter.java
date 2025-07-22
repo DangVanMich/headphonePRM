@@ -1,7 +1,6 @@
 package com.example.headphones_ecommerce_store.adapters;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,19 +18,13 @@ import java.util.List;
 public class HeadphoneAdapter extends RecyclerView.Adapter<HeadphoneAdapter.ViewHolder> {
     private List<HeadphoneInfo> headphoneList;
     private Context context;
-    private OnItemClickListener listener;
 
-    public interface OnItemClickListener {
-        void onItemClick(HeadphoneInfo headphone);
-    }
-
-    public HeadphoneAdapter(Context context, List<HeadphoneInfo> headphoneList, OnItemClickListener listener) {
+    public HeadphoneAdapter(Context context, List<HeadphoneInfo> headphoneList) {
         this.context = context;
         this.headphoneList = headphoneList;
-        this.listener = listener;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView img;
         TextView name, brand, price;
 
@@ -41,14 +34,6 @@ public class HeadphoneAdapter extends RecyclerView.Adapter<HeadphoneAdapter.View
             name = itemView.findViewById(R.id.txtName);
             brand = itemView.findViewById(R.id.txtBrand);
             price = itemView.findViewById(R.id.txtPrice);
-            itemView.setOnClickListener(v -> {
-                int position = getAdapterPosition();
-                if (listener != null && position != RecyclerView.NO_POSITION) {
-                    Log.d("AdapterClick", "HeadphoneAdapter: Item clicked at position " + position);
-                    listener.onItemClick(headphoneList.get(position));
-                }
-            });
-
         }
     }
 

@@ -3,7 +3,7 @@ package com.example.headphones_ecommerce_store.controller;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,37 +28,45 @@ public class MainHomeActivity extends AppCompatActivity {
     private RecyclerView rvHeadphones;
     private HeadphoneAdapter adapter;
     private List<HeadphoneInfo> headphoneList;
+    private TextView tvGreeting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_home);
+
+        // Hide the action bar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
+        // Initialize greeting TextView
+        tvGreeting = findViewById(R.id.tvGreeting); // Ensure this ID matches the XML
+        String userFullName = getIntent().getStringExtra("user_full_name");
+        if (userFullName != null && !userFullName.isEmpty()) {
+            tvGreeting.setText("Chào, " + userFullName);
+        } else {
+            tvGreeting.setText("Chào, Khách");
+        }
+
         rvHeadphones = findViewById(R.id.rvHeadphones);
         rvHeadphones.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         // Khởi tạo dữ liệu mẫu
         headphoneList = new ArrayList<>();
-        headphoneList.add(new HeadphoneInfo(1,"Sony WH-1000XM5", "Sony", 399.99, "https://m.media-amazon.com/images/I/61bK6PMOC3L._AC_SL1500_.jpg"));
-        headphoneList.add(new HeadphoneInfo(2,"Bose QC 45", "Bose", 329.00, "https://m.media-amazon.com/images/I/61bK6PMOC3L._AC_SL1500_.jpg"));
-        headphoneList.add(new HeadphoneInfo(3,"AirPods Max", "Apple", 549.00, "https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/airpods-max-select-silver-202011?wid=2000&hei=2000"));
-        headphoneList.add(new HeadphoneInfo(4,"Momentum 4", "Sennheiser", 379.95, "https://m.media-amazon.com/images/I/81yYo8VHFmL._AC_SL1500_.jpg"));
-        headphoneList.add(new HeadphoneInfo(5,"Beats Studio Pro", "Beats", 349.95, "https://m.media-amazon.com/images/I/71N1njN3dDL._AC_SL1500_.jpg"));
-        headphoneList.add(new HeadphoneInfo(6,"Jabra Elite 85h", "Jabra", 199.99, "https://m.media-amazon.com/images/I/81XQy2L7WXL._AC_SL1500_.jpg"));
-        headphoneList.add(new HeadphoneInfo(7,"Anker Q35", "Anker", 129.99, "https://m.media-amazon.com/images/I/61B+R39V2eL._AC_SL1500_.jpg"));
-        headphoneList.add(new HeadphoneInfo(8,"Marshall Major IV", "Marshall", 149.99, "https://m.media-amazon.com/images/I/81QQ7Mi99XL._AC_SL1500_.jpg"));
-        headphoneList.add(new HeadphoneInfo(9,"AKG N700NC M2", "AKG", 299.99, "https://m.media-amazon.com/images/I/81Azc5yCgfL._AC_SL1500_.jpg"));
-        headphoneList.add(new HeadphoneInfo(10,"Shure AONIC 50", "Shure", 299.00, "https://m.media-amazon.com/images/I/61lHRD3X1IL._AC_SL1500_.jpg"));
+        headphoneList.add(new HeadphoneInfo("Sony WH-1000XM5", "Sony", 399.99, "https://m.media-amazon.com/images/I/61bK6PMOC3L._AC_SL1500_.jpg"));
+        headphoneList.add(new HeadphoneInfo("Bose QC 45", "Bose", 329.00, "https://m.media-amazon.com/images/I/61bK6PMOC3L._AC_SL1500_.jpg"));
+        headphoneList.add(new HeadphoneInfo("AirPods Max", "Apple", 549.00, "https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/airpods-max-select-silver-202011?wid=2000&hei=2000"));
+        headphoneList.add(new HeadphoneInfo("Momentum 4", "Sennheiser", 379.95, "https://m.media-amazon.com/images/I/81yYo8VHFmL._AC_SL1500_.jpg"));
+        headphoneList.add(new HeadphoneInfo("Beats Studio Pro", "Beats", 349.95, "https://m.media-amazon.com/images/I/71N1njN3dDL._AC_SL1500_.jpg"));
+        headphoneList.add(new HeadphoneInfo("Jabra Elite 85h", "Jabra", 199.99, "https://m.media-amazon.com/images/I/81XQy2L7WXL._AC_SL1500_.jpg"));
+        headphoneList.add(new HeadphoneInfo("Anker Q35", "Anker", 129.99, "https://m.media-amazon.com/images/I/61B+R39V2eL._AC_SL1500_.jpg"));
+        headphoneList.add(new HeadphoneInfo("Marshall Major IV", "Marshall", 149.99, "https://m.media-amazon.com/images/I/81QQ7Mi99XL._AC_SL1500_.jpg"));
+        headphoneList.add(new HeadphoneInfo("AKG N700NC M2", "AKG", 299.99, "https://m.media-amazon.com/images/I/81Azc5yCgfL._AC_SL1500_.jpg"));
+        headphoneList.add(new HeadphoneInfo("Shure AONIC 50", "Shure", 299.00, "https://m.media-amazon.com/images/I/61lHRD3X1IL._AC_SL1500_.jpg"));
 
-        adapter = new HeadphoneAdapter(this, headphoneList, headphone -> {
-            Log.d("MainHomeClick", "Clicked on: " + headphone.getName());
-            Intent intent = new Intent(MainHomeActivity.this, ProductDetailActivity.class);
-
-            intent.putExtra(ProductDetailActivity.EXTRA_PRODUCT_OBJECT, headphone);
-
-            startActivity(intent);
-        });
+        adapter = new HeadphoneAdapter(this, headphoneList);
         rvHeadphones.setAdapter(adapter);
-
 
         List<String> rankingCategories = Arrays.asList("Sony", "Apple", "Jabra");
 
@@ -71,7 +79,6 @@ public class MainHomeActivity extends AppCompatActivity {
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             tab.setText(rankingCategories.get(position));
         }).attach();
-
 
         ViewPager2 bannerViewPager = findViewById(R.id.bannerViewPager);
         List<Integer> bannerList = Arrays.asList(
@@ -95,7 +102,6 @@ public class MainHomeActivity extends AppCompatActivity {
             }
         }, 3000);
 
-
         // Bottom Navigation
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
         bottomNav.setSelectedItemId(R.id.menu_home); // Đánh dấu đang ở tab Home
@@ -112,23 +118,9 @@ public class MainHomeActivity extends AppCompatActivity {
                 intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
                 return true;
-
-//            } else if (itemId == R.id.menu_cart) {
-//                Intent intent = new Intent(MainHomeActivity.this, CartActivity.class);
-//                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-//                startActivity(intent);
-//                return true;
-//
-//            } else if (itemId == R.id.menu_map) {
-//                Intent intent = new Intent(MainHomeActivity.this, MapActivity.class);
-//                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-//                startActivity(intent);
-//                return true;
             }
 
             return false;
         });
-
     }
 }
-

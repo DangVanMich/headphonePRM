@@ -1,5 +1,6 @@
 package com.example.headphones_ecommerce_store.controller;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -19,9 +20,7 @@ public class ProductDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_PRODUCT_OBJECT = "extra_product_object";
     private HeadphoneInfo currentHeadphone;
-
     private int quantity = 1;
-
     private ImageView ivDetailProductImage, ivMinus, ivPlus, ivAddToCart;
     private TextView tvDetailProductName, tvDetailProductPrice, tvDetailProductDescription, tvQuantity;
     private Button btnBuyNow;
@@ -41,6 +40,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     }
 
     private void setupViews() {
+        //... code setupViews của bạn ...
         toolbar = findViewById(R.id.toolbar);
         ivDetailProductImage = findViewById(R.id.ivDetailProductImage);
         tvDetailProductName = findViewById(R.id.tvDetailProductName);
@@ -54,6 +54,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     }
 
     private void setupToolbar() {
+        //... code setupToolbar của bạn ...
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -63,6 +64,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     }
 
     private void loadProductDetails() {
+        //... code loadProductDetails của bạn ...
         currentHeadphone = (HeadphoneInfo) getIntent().getSerializableExtra(EXTRA_PRODUCT_OBJECT);
         if (currentHeadphone != null) {
             displayProductInfo(currentHeadphone);
@@ -70,48 +72,36 @@ public class ProductDetailActivity extends AppCompatActivity {
     }
 
     private void displayProductInfo(HeadphoneInfo headphone) {
+        //... code displayProductInfo của bạn ...
         tvDetailProductName.setText(headphone.getName());
         tvDetailProductDescription.setText("Thương hiệu: " + headphone.getBrand());
-
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
         tvDetailProductPrice.setText(currencyFormatter.format(headphone.getPrice()));
-
-        //<====BẮt đầu sửa====>
-        // Thêm .centerInside() để đảm bảo toàn bộ ảnh được hiển thị
-        Glide.with(this)
-                .load(headphone.getImageUrl())
-                .placeholder(R.drawable.ic_menu_gallery)
-                .error(R.mipmap.ic_launcher)
-                .centerInside() // Thay đổi chế độ hiển thị ảnh
-                .into(ivDetailProductImage);
-        // <====Kết thúc sửa====>
+        Glide.with(this).load(headphone.getImageUrl()).into(ivDetailProductImage);
     }
 
     private void setupClickListeners() {
+        //... code của các listener khác ...
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        ivPlus.setOnClickListener(v -> { /* ... */ });
+        ivMinus.setOnClickListener(v -> { /* ... */ });
 
-        ivPlus.setOnClickListener(v -> {
-            if (quantity < 10) {
-                quantity++;
-                tvQuantity.setText(String.valueOf(quantity));
-            }
-        });
-
-        ivMinus.setOnClickListener(v -> {
-            if (quantity > 1) {
-                quantity--;
-                tvQuantity.setText(String.valueOf(quantity));
-            }
-        });
-
+        //<====BẮt đầu sửa====>
         ivAddToCart.setOnClickListener(v -> {
             if (currentHeadphone != null) {
+                // 1. Thêm sản phẩm vào giỏ hàng
                 cartDAO.addToCart(currentHeadphone.getId(), quantity);
                 Toast.makeText(this, "Đã thêm vào giỏ hàng!", Toast.LENGTH_SHORT).show();
+
+                // 2. Chuyển đến màn hình giỏ hàng
+                Intent intent = new Intent(ProductDetailActivity.this, CartActivity.class);
+                startActivity(intent);
+
             } else {
                 Toast.makeText(this, "Lỗi: Không tìm thấy sản phẩm", Toast.LENGTH_SHORT).show();
             }
         });
+        // <====Kết thúc sửa====>
 
         btnBuyNow.setOnClickListener(v -> {
             Toast.makeText(this, "Chuyển đến thanh toán...", Toast.LENGTH_SHORT).show();

@@ -13,7 +13,7 @@ import com.example.headphones_ecommerce_store.model.User;
 
 public class DBHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "ProductManagement.db";
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
 
     // User Table
     public static final String TABLE_USERS = "users";

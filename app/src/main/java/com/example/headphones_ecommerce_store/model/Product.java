@@ -1,11 +1,12 @@
 package com.example.headphones_ecommerce_store.model;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 // import android.os.Parcel; // For Parcelable
 // import android.os.Parcelable; // For Parcelable
 
-public class Product /* implements Parcelable */ { // Implement Parcelable if needed
+public class Product implements Serializable {
     private long id;
     private String name;
     private String brand;

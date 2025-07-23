@@ -1,11 +1,19 @@
 package com.example.headphones_ecommerce_store.controller;
 
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.headphones_ecommerce_store.DAO.UserDAO;
 import com.example.headphones_ecommerce_store.R;
 import com.example.headphones_ecommerce_store.database.DBHelper;
 import com.example.headphones_ecommerce_store.model.User;
@@ -16,8 +24,10 @@ public class ProfileDetailActivity extends AppCompatActivity {
 
     BottomNavigationView bottomNav;
     private DBHelper dbHelper;
-    private TextView tvNameHeader, tvLocationHeader, tvName, tvGender, tvDob, tvAge, tvAddress, tvPhone, tvEmail, tvRegisteredSince;
+    private TextView tvNameHeader, tvLocationHeader, tvName, tvEmail;
     private ImageView ivProfileImage;
+    private Button btnUpdate;
+    private UserDAO userDAO = new UserDAO(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,29 +38,24 @@ public class ProfileDetailActivity extends AppCompatActivity {
         // Initialize DBHelper
         dbHelper = new DBHelper(this);
 
-        // Initialize UI elements
         ivProfileImage = findViewById(R.id.ivProfileImage); // Add this ID to ImageView
         tvNameHeader = findViewById(R.id.tvNameHeader);
         tvLocationHeader = findViewById(R.id.tvLocationHeader);
         tvName = findViewById(R.id.tvName);
-        tvGender = findViewById(R.id.tvGender);
-        tvDob = findViewById(R.id.tvDob);
-        tvAge = findViewById(R.id.tvAge);
-        tvAddress = findViewById(R.id.tvAddress);
-        tvPhone = findViewById(R.id.tvPhone);
         tvEmail = findViewById(R.id.tvEmail);
-        tvRegisteredSince = findViewById(R.id.tvRegisteredSince);
+        btnUpdate = findViewById(R.id.btnUpdateInfo);
 
-        // Get email from Intent
-        String email = getIntent().getStringExtra("user_email");
+        // Lấy tên từ SharedPreferences
+        SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        String email = prefs.getString("userEmail", "email@unknown.com");
         if (email != null) {
             // Fetch user details
             User user = dbHelper.getUserByEmail(email);
             if (user != null) {
                 // Update UI with user data
                 tvNameHeader.setText(user.getDisplayName() != null ? user.getDisplayName() : "Unknown");
-                tvLocationHeader.setText("Viet Nam"); // Static for now
-                tvName.setText("Name: " + (user.getDisplayName() != null ? user.getDisplayName() : "Unknown"));
+                tvLocationHeader.setText("Viet Nam");
+                tvName.setText("Họ và tên: " + (user.getDisplayName() != null ? user.getDisplayName() : "Unknown"));
                 tvEmail.setText("Email: " + (user.getEmail() != null ? user.getEmail() : "Not set"));
                 // Load profile image if available
                 if (user.getProfileImageUrl() != null && !user.getProfileImageUrl().isEmpty()) {
@@ -58,20 +63,59 @@ public class ProfileDetailActivity extends AppCompatActivity {
                 } else {
                     ivProfileImage.setImageResource(R.drawable.ic_placeholder); // Default image
                 }
-                // Placeholder for other fields (to be fetched or set from DB/model)
-                tvGender.setText("Gender: Not set"); // Add to DB if needed
-                tvDob.setText("Date of Birth: Not set"); // Add to DB if needed
-                tvAge.setText("Age: Not set"); // Calculate or add to DB
-                tvAddress.setText("Address: Not set"); // Fetch from shippingAddresses
-                tvPhone.setText("Phone: Not set"); // Add to DB if needed
-                tvRegisteredSince.setText("Registered since: " + (user.getRegistrationDate() != null ? user.getRegistrationDate() : "Not set"));
-                // Note: registrationDate is not a field in User yet; add a getter if needed
+
             } else {
                 Toast.makeText(this, "User not found", Toast.LENGTH_SHORT).show();
             }
         } else {
             Toast.makeText(this, "No user email found", Toast.LENGTH_SHORT).show();
         }
+
+
+        //check sk nút update
+        btnUpdate.setOnClickListener(v -> {
+
+            View dialogView = getLayoutInflater().inflate(R.layout.dialog_update_info, null);
+            EditText edtName = dialogView.findViewById(R.id.edtName);
+            EditText edtEmail = dialogView.findViewById(R.id.edtEmail);
+
+            edtName.setText(prefs.getString("userFullName", ""));
+            edtEmail.setText(prefs.getString("userEmail", ""));
+
+            new AlertDialog.Builder(this)
+                    .setView(dialogView)
+                    .setPositiveButton("Lưu", (dialog, which) -> {
+                        String newName = edtName.getText().toString().trim();
+                        String newEmail = edtEmail.getText().toString().trim();
+
+                        User user = dbHelper.getUserByEmail(email);
+                        Log.d("DEBUG_USER", "User not found for email: " + email);
+                        boolean success = userDAO.updateUserBasicInfo(user.getId(), newName, newEmail);
+                        if (success) {
+                            Toast.makeText(this, "Cập nhật thành công", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(this, "Cập nhật thất bại", Toast.LENGTH_SHORT).show();
+                        }
+
+                        // Lưu lại vào SharedPreferences
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putString("userFullName", newName);
+                        editor.putString("userEmail", newEmail);
+                        editor.apply();
+
+                        TextView tvName = findViewById(R.id.tvName);
+                        TextView tvEmail = findViewById(R.id.tvEmail);
+                        TextView tvNameHeader = findViewById(R.id.tvNameHeader);
+
+                        tvName.setText("Tên: " + newName);
+                        tvEmail.setText("Email: " + newEmail);
+                        tvNameHeader.setText(newName);
+                    })
+                    .setNegativeButton("Huỷ", null)
+                    .show();
+        });
+
+
 
         setupBottomNav();
     }

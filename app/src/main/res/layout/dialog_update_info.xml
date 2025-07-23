@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="24dp"
+    android:orientation="vertical"
+    android:background="@drawable/bg_dialog_rounded"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:text="Cập nhật thông tin"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#333"
+        android:layout_marginBottom="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <EditText
+        android:id="@+id/edtName"
+        android:hint="Họ và tên"
+        android:padding="12dp"
+        android:background="@drawable/bg_edittext_rounded"
+        android:textSize="16sp"
+        android:layout_width="match_parent"
+        android:layout_height="48dp" />
+
+    <EditText
+        android:id="@+id/edtEmail"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        android:padding="12dp"
+        android:background="@drawable/bg_edittext_rounded"
+        android:textSize="16sp"
+        android:layout_marginTop="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="48dp" />
+
+</LinearLayout>

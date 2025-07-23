@@ -9,6 +9,7 @@ import static com.example.headphones_ecommerce_store.database.DBHelper.COLUMN_PR
 import static com.example.headphones_ecommerce_store.database.DBHelper.COLUMN_PRODUCT_THUMBNAIL_IMAGE_URL;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,6 +18,7 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -49,6 +51,7 @@ public class MainHomeActivity extends AppCompatActivity {
     private ProductDAO productDAO;
     EditText searchEditText;
     //Button btnSony, btnApple, btnJabra, btnAnker;
+    TextView tvGreeting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +61,12 @@ public class MainHomeActivity extends AppCompatActivity {
         BottomNavHelper.setupBottomNav(this, R.id.menu_home);
         rvHeadphones = findViewById(R.id.rvHeadphones);
         rvHeadphones.setLayoutManager(new LinearLayoutManager(this));
+        tvGreeting = findViewById(R.id.tvGreeting);
+        // Lấy tên từ SharedPreferences
+        SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        String fullName = prefs.getString("userFullName", "Người dùng");
+        tvGreeting.setText("Chào, " + fullName);
+
         searchEditText = findViewById(R.id.searchEditText);
         findViewById(R.id.btnSony).setOnClickListener(v -> applyFilter(searchEditText.getText().toString(), "Sony"));
         findViewById(R.id.btnApple).setOnClickListener(v -> applyFilter(searchEditText.getText().toString(), "Apple"));

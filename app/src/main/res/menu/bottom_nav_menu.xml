@@ -8,8 +8,8 @@
     <item android:id="@+id/menu_cart"
         android:icon="@drawable/ic_cart"
         android:title="Giỏ hàng"/>
-    <item android:id="@+id/menu_map"
+    <item android:id="@+id/manager_product"
         android:icon="@drawable/ic_map"
-        android:title="Bản đồ"/>
+        android:title="Quan li san pham"/>
 </menu>
 

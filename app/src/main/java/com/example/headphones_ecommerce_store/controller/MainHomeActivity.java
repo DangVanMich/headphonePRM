@@ -1,11 +1,22 @@
 package com.example.headphones_ecommerce_store.controller;
 
+import static com.example.headphones_ecommerce_store.database.DBHelper.COLUMN_PRODUCT_AVERAGE_RATING;
+import static com.example.headphones_ecommerce_store.database.DBHelper.COLUMN_PRODUCT_BRAND;
+import static com.example.headphones_ecommerce_store.database.DBHelper.COLUMN_PRODUCT_DESC;
+import static com.example.headphones_ecommerce_store.database.DBHelper.COLUMN_PRODUCT_ID;
+import static com.example.headphones_ecommerce_store.database.DBHelper.COLUMN_PRODUCT_NAME;
+import static com.example.headphones_ecommerce_store.database.DBHelper.COLUMN_PRODUCT_PRICE;
+import static com.example.headphones_ecommerce_store.database.DBHelper.COLUMN_PRODUCT_THUMBNAIL_IMAGE_URL;
+
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.Button;
+import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,7 +29,7 @@ import com.example.headphones_ecommerce_store.adapters.BannerAdapter;
 import com.example.headphones_ecommerce_store.adapters.HeadphoneAdapter;
 import com.example.headphones_ecommerce_store.adapters.RankingPagerAdapter;
 import com.example.headphones_ecommerce_store.model.Product;
-import com.example.headphones_ecommerce_store.models.HeadphoneInfo;
+import com.example.headphones_ecommerce_store.ui.product.AddEditProductActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -26,77 +37,107 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class MainHomeActivity extends AppCompatActivity {
+
     private RecyclerView rvHeadphones;
     private HeadphoneAdapter adapter;
-    private List<HeadphoneInfo> headphoneList;
-    private TextView tvGreeting;
-
+    private List<Product> productList;
+    private List<Product> allProducts = new ArrayList<>();
+    private List<Product> filteredProducts = new ArrayList<>();
     private ProductDAO productDAO;
+    EditText searchEditText;
+    //Button btnSony, btnApple, btnJabra, btnAnker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_home);
 
-        // Hide the action bar
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-        }
+        BottomNavHelper.setupBottomNav(this, R.id.menu_home);
+        rvHeadphones = findViewById(R.id.rvHeadphones);
+        rvHeadphones.setLayoutManager(new LinearLayoutManager(this));
+        searchEditText = findViewById(R.id.searchEditText);
+        findViewById(R.id.btnSony).setOnClickListener(v -> applyFilter(searchEditText.getText().toString(), "Sony"));
+        findViewById(R.id.btnApple).setOnClickListener(v -> applyFilter(searchEditText.getText().toString(), "Apple"));
+        findViewById(R.id.btnJabra).setOnClickListener(v -> applyFilter(searchEditText.getText().toString(), "Jabra"));
+        findViewById(R.id.btnAnker).setOnClickListener(v -> applyFilter(searchEditText.getText().toString(), "Anker"));
+        findViewById(R.id.btnAll).setOnClickListener(v ->  applyFilter(searchEditText.getText().toString(), null));
 
         productDAO = new ProductDAO(this);
-        seedDatabaseIfEmpty(); // Bây giờ hàm này sẽ chạy đúng
 
-        // Initialize greeting TextView
-        tvGreeting = findViewById(R.id.tvGreeting); // Ensure this ID matches the XML
-        String userFullName = getIntent().getStringExtra("user_full_name");
-        if (userFullName != null && !userFullName.isEmpty()) {
-            tvGreeting.setText("Chào, " + userFullName);
-        } else {
-            tvGreeting.setText("Chào, Khách");
+        this.seedDatabaseIfEmpty();
+
+        Cursor cursor = productDAO.getAllProducts(null);
+        productList = new ArrayList<>();
+
+//        test list khi add product ko đủ dữ liệu
+//        productList.add(new Product(2, "AirPods Max", "Apple", "Âm thanh không gian, thiết kế cao cấp", 549.00, "https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/airpods-max-select-silver-202011?wid=2000&hei=2000", 4.2f));
+//        productList.add(new Product(3, "Jabra Elite 85h", "Jabra", "Chống ồn chủ động, kết nối đa thiết bị", 199.99, "https://m.media-amazon.com/images/I/81XQy2L7WXL._AC_SL1500_.jpg", 2.2f));
+//        productList.add(new Product(4, "Jabra Elite 85h", "Jabra", "Chống ồn chủ động, kết nối đa thiết bị", 199.99, "https://m.media-amazon.com/images/I/81XQy2L7WXL._AC_SL1500_.jpg", 3.5f));
+
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                Product product = new Product();
+                product.setId(cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_PRODUCT_ID)));
+                product.setName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRODUCT_NAME)));
+
+                product.setBrand(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRODUCT_BRAND)));
+//                product.setBrand(Objects.requireNonNullElse(
+//                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRODUCT_BRAND)), "All"));
+
+                product.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRODUCT_DESC)));
+                product.setPrice(cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_PRODUCT_PRICE)));
+                product.setThumbnailImageUrl(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRODUCT_THUMBNAIL_IMAGE_URL)));
+                Float raking = cursor.getFloat(cursor.getColumnIndexOrThrow(COLUMN_PRODUCT_AVERAGE_RATING));
+                product.setAverageRating(raking == null ? 1 : raking);
+
+                productList.add(product);
+            } while (cursor.moveToNext());
+            cursor.close();
         }
 
-        rvHeadphones = findViewById(R.id.rvHeadphones);
-        rvHeadphones.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        allProducts = productList;
+        filteredProducts = new ArrayList<>(allProducts);
 
-        // Khởi tạo dữ liệu mẫu
-        headphoneList = new ArrayList<>();
-        headphoneList.add(new HeadphoneInfo(1,"Sony WH-1000XM5", "Sony", 399.99, "https://m.media-amazon.com/images/I/61bK6PMOC3L._AC_SL1500_.jpg"));
-        headphoneList.add(new HeadphoneInfo(2,"Bose QC 45", "Bose", 329.00, "https://m.media-amazon.com/images/I/61bK6PMOC3L._AC_SL1500_.jpg"));
-        headphoneList.add(new HeadphoneInfo(3,"AirPods Max", "Apple", 549.00, "https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/airpods-max-select-silver-202011?wid=2000&hei=2000"));
-        headphoneList.add(new HeadphoneInfo(4,"Momentum 4", "Sennheiser", 379.95, "https://m.media-amazon.com/images/I/81yYo8VHFmL._AC_SL1500_.jpg"));
-        headphoneList.add(new HeadphoneInfo(5,"Beats Studio Pro", "Beats", 349.95, "https://m.media-amazon.com/images/I/71N1njN3dDL._AC_SL1500_.jpg"));
-        headphoneList.add(new HeadphoneInfo(6,"Jabra Elite 85h", "Jabra", 199.99, "https://m.media-amazon.com/images/I/81XQy2L7WXL._AC_SL1500_.jpg"));
-        headphoneList.add(new HeadphoneInfo(7,"Anker Q35", "Anker", 129.99, "https://m.media-amazon.com/images/I/61B+R39V2eL._AC_SL1500_.jpg"));
-        headphoneList.add(new HeadphoneInfo(8,"Marshall Major IV", "Marshall", 149.99, "https://m.media-amazon.com/images/I/81QQ7Mi99XL._AC_SL1500_.jpg"));
-        headphoneList.add(new HeadphoneInfo(9,"AKG N700NC M2", "AKG", 299.99, "https://m.media-amazon.com/images/I/81Azc5yCgfL._AC_SL1500_.jpg"));
-        headphoneList.add(new HeadphoneInfo(10,"Shure AONIC 50", "Shure", 299.00, "https://m.media-amazon.com/images/I/61lHRD3X1IL._AC_SL1500_.jpg"));
-
-        adapter = new HeadphoneAdapter(this, headphoneList, headphone -> {
-            Log.d("MainHomeClick", "Clicked on: " + headphone.getName() + " with ID: " + headphone.getId());
+        // bấm vào sản phẩm (đổi model r)
+        adapter = new HeadphoneAdapter(this, filteredProducts, product -> {
+            Log.d("MainHomeClick", "Clicked on: " + product.getName() + " with ID: " + product.getId());
 
             Intent intent = new Intent(MainHomeActivity.this, ProductDetailActivity.class);
 
             // Chỉ gửi ID của sản phẩm
-            intent.putExtra(ProductDetailActivity.EXTRA_PRODUCT_ID, headphone.getId());
-
+            intent.putExtra(ProductDetailActivity.EXTRA_PRODUCT_ID, product.getId());
+            //intent.putExtra(ProductDetailActivity.EXTRA_PRODUCT_OBJECT, product);
             startActivity(intent);
         });
         rvHeadphones.setAdapter(adapter);
+        //Check event search
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void afterTextChanged(Editable s) {}
 
-        List<String> rankingCategories = Arrays.asList("Sony", "Apple", "Jabra");
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                applyFilter(s.toString(), null);
+            }
+        });
+
+        // Ranking
+        List<String> rankingCategories = Arrays.asList("Sony", "Apple", "Jabra", "Anker");
 
         TabLayout tabLayout = findViewById(R.id.tabLayout);
         ViewPager2 viewPager = findViewById(R.id.viewPagerRanking);
-        RankingPagerAdapter pagerAdapter = new RankingPagerAdapter(this, rankingCategories);
+        RankingPagerAdapter pagerAdapter = new RankingPagerAdapter(this, rankingCategories, allProducts);
         viewPager.setAdapter(pagerAdapter);
-
-        // Đồng bộ TabLayout với ViewPager2
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             tab.setText(rankingCategories.get(position));
         }).attach();
 
+
+        // Banner Slider
         ViewPager2 bannerViewPager = findViewById(R.id.bannerViewPager);
         List<Integer> bannerList = Arrays.asList(
                 R.drawable.banner1,
@@ -106,39 +147,32 @@ public class MainHomeActivity extends AppCompatActivity {
         BannerAdapter bannerAdapter = new BannerAdapter(bannerList);
         bannerViewPager.setAdapter(bannerAdapter);
 
-        // Tự động lướt banner mỗi 3s
         new Handler().postDelayed(new Runnable() {
             int index = 0;
+
             @Override
             public void run() {
                 if (bannerViewPager.getAdapter() != null) {
                     index = (bannerViewPager.getCurrentItem() + 1) % bannerList.size();
                     bannerViewPager.setCurrentItem(index, true);
                 }
-                bannerViewPager.postDelayed(this, 3000);
+                bannerViewPager.postDelayed(this, 5000);
             }
-        }, 3000);
+        }, 5000);
+    }
+    private void applyFilter(String keyword, String brand) {
+        filteredProducts.clear();
 
-        // Bottom Navigation
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
-        bottomNav.setSelectedItemId(R.id.menu_home); // Đánh dấu đang ở tab Home
+        for (Product p : allProducts) {
+            boolean matchName = p.getName().toLowerCase().contains(keyword.toLowerCase());
+            boolean matchBrand = (brand == null || p.getBrand().equalsIgnoreCase(brand));
 
-        bottomNav.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-
-            if (itemId == R.id.menu_home) {
-                // Đã ở Home, không làm gì
-                return true;
-
-            } else if (itemId == R.id.menu_profile) {
-                Intent intent = new Intent(MainHomeActivity.this, ProfileActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
-                return true;
+            if (matchName && matchBrand) {
+                filteredProducts.add(p);
             }
+        }
 
-            return false;
-        });
+        adapter.notifyDataSetChanged();
     }
 
     private void seedDatabaseIfEmpty() {
@@ -178,4 +212,6 @@ public class MainHomeActivity extends AppCompatActivity {
             Log.d("DatabaseSeed", "Database already contains data. No seeding needed.");
         }
     }
+
 }
+

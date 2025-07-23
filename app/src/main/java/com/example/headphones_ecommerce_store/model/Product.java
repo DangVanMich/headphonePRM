@@ -63,6 +63,16 @@ public class Product /* implements Parcelable */ { // Implement Parcelable if ne
         this.price = price;
     }
 
+    public Product(long id, String name, String brand, String description, double price, String thumbnailImageUrl, float averageRating){
+        this.id = id;
+        this.name = name;
+        this.brand = brand;
+        this.description = description;
+        this.price = price;
+        this.thumbnailImageUrl = thumbnailImageUrl;
+        this.averageRating = averageRating;
+    }
+
     public Product(long id, String name, String brand, String description, double price, String thumbnailImageUrl) {
         this.id = id;
         this.name = name;
@@ -74,6 +84,7 @@ public class Product /* implements Parcelable */ { // Implement Parcelable if ne
 
     // Getters
     public long getId() { return id; }
+
     public String getName() { return name; }
     public String getBrand() { return brand; }
     public String getDescription() { return description; }

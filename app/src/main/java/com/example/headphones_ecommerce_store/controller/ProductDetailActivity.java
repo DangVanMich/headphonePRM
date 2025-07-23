@@ -42,7 +42,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_detail);
-
+        BottomNavHelper.setupBottomNav(this, 0);
         cartDAO = new CartDAO(this);
         productRepository = new ProductRepository(this);
 

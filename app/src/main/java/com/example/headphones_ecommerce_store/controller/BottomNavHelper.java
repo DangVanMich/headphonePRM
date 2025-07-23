@@ -11,6 +11,7 @@ public class BottomNavHelper {
 
     public static void setupBottomNav(Activity activity, int selectedItemId) {
         BottomNavigationView bottomNav = activity.findViewById(R.id.bottomNavigationView);
+
         bottomNav.setSelectedItemId(selectedItemId);
 
         bottomNav.setOnItemSelectedListener(item -> {

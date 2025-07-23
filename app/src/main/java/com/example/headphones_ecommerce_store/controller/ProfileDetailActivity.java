@@ -34,7 +34,7 @@ public class ProfileDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_detail);
         getSupportActionBar().hide();
-
+        BottomNavHelper.setupBottomNav(this, 0);
         // Initialize DBHelper
         dbHelper = new DBHelper(this);
 
@@ -115,32 +115,6 @@ public class ProfileDetailActivity extends AppCompatActivity {
                     .show();
         });
 
-
-
-        setupBottomNav();
     }
 
-    private void setupBottomNav() {
-        bottomNav = findViewById(R.id.bottomNavigationView);
-        bottomNav.setSelectedItemId(R.id.menu_profile);
-
-        bottomNav.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-
-            if (itemId == R.id.menu_home) {
-                Intent intent = new Intent(ProfileDetailActivity.this, MainHomeActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
-                return true;
-
-            } else if (itemId == R.id.menu_profile) {
-                Intent intent = new Intent(ProfileDetailActivity.this, ProfileActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
-                return true;
-            }
-
-            return false;
-        });
-    }
 }

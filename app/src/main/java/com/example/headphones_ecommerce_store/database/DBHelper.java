@@ -13,7 +13,7 @@ import com.example.headphones_ecommerce_store.model.User;
 
 public class DBHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "ProductManagement.db";
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
 
     // User Table
     public static final String TABLE_USERS = "users";
@@ -67,6 +67,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_CART_ID = "id";
     public static final String COLUMN_CART_PRODUCT_ID = "product_id";
     public static final String COLUMN_CART_QUANTITY = "quantity";
+    public static final String COLUMN_CART_USER_ID = "user_id";
 
     // Orders Table
     public static final String TABLE_ORDERS = "orders";
@@ -74,6 +75,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_ORDER_DATE = "order_date";
     public static final String COLUMN_ORDER_TOTAL = "total_amount";
     public static final String COLUMN_ORDER_STATUS = "status";
+    public static final String COLUMN_ORDER_USER_ID = "user_id";
 
     // Order Items Table
     public static final String TABLE_ORDER_ITEMS = "order_items";
@@ -164,7 +166,9 @@ public class DBHelper extends SQLiteOpenHelper {
                 + COLUMN_CART_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + COLUMN_CART_PRODUCT_ID + " INTEGER,"
                 + COLUMN_CART_QUANTITY + " INTEGER,"
-                + "FOREIGN KEY (" + COLUMN_CART_PRODUCT_ID + ") REFERENCES " + TABLE_PRODUCTS + "(" + COLUMN_PRODUCT_ID + ")"
+                + COLUMN_CART_USER_ID + " INTEGER," // <-- THÊM DÒNG NÀY
+                + "FOREIGN KEY (" + COLUMN_CART_PRODUCT_ID + ") REFERENCES " + TABLE_PRODUCTS + "(" + COLUMN_PRODUCT_ID + "),"
+                + "FOREIGN KEY (" + COLUMN_CART_USER_ID + ") REFERENCES " + TABLE_USERS + "(" + COLUMN_USER_ID + ")" // <-- THÊM DÒNG NÀY
                 + ")";
         db.execSQL(CREATE_TABLE_CART);
 
@@ -172,7 +176,10 @@ public class DBHelper extends SQLiteOpenHelper {
                 + COLUMN_ORDER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + COLUMN_ORDER_DATE + " TEXT,"
                 + COLUMN_ORDER_TOTAL + " REAL,"
-                + COLUMN_ORDER_STATUS + " TEXT" + ")";
+                + COLUMN_ORDER_STATUS + " TEXT,"
+                + COLUMN_ORDER_USER_ID + " INTEGER,"
+                + "FOREIGN KEY (" + COLUMN_ORDER_USER_ID + ") REFERENCES " + TABLE_USERS + "(" + COLUMN_USER_ID + ")"
+                + ")";
         db.execSQL(CREATE_TABLE_ORDERS);
 
         String CREATE_TABLE_ORDER_ITEMS = "CREATE TABLE " + TABLE_ORDER_ITEMS + "("
@@ -205,6 +212,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PRODUCT_COLOR_OPTIONS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PRODUCT_FEATURES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PRODUCT_IMAGE_URLS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CART);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PRODUCTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER_ITEMS);
@@ -312,5 +320,22 @@ public class DBHelper extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return user;
+    }
+
+    public long getUserIdByEmail(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_USERS, new String[]{COLUMN_USER_ID}, COLUMN_USER_EMAIL + " = ?",
+                new String[]{email}, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            long userId = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_USER_ID));
+            cursor.close();
+            db.close();
+            return userId;
+        }
+        if (cursor != null) {
+            cursor.close();
+        }
+        db.close();
+        return -1; // Trả về -1 nếu không tìm thấy
     }
 }

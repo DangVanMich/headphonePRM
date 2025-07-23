@@ -24,6 +24,9 @@
             android:name=".ui.auth.RegisterActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.auth.ResetPasswordActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.auth.LoginActivity"
             android:exported="false" />
         <activity
@@ -53,6 +56,10 @@
             android:theme="@style/Theme.Headphonesecommercestore.NoActionBar" />
         <activity
             android:name=".controller.PaymentSuccessActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Headphonesecommercestore.NoActionBar" />
+        <activity
+            android:name=".ui.support.SupportActivity"
             android:exported="false"
             android:theme="@style/Theme.Headphonesecommercestore.NoActionBar" />
         <activity

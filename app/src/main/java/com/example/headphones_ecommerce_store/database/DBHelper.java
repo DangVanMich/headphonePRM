@@ -91,6 +91,13 @@ public class DBHelper extends SQLiteOpenHelper {
         super(context, name, factory, version);
     }
 
+    //Message Table
+    public static final String TABLE_MESSAGE = "message";
+    public static final String COLUMN_MESSAGE_ID = "id";
+    public static final String COLUMN_MESSAGE_SENDER = "sender";
+    public static final String COLUMN_MESSAGE_RECEIVER = "receiver";
+    public static final String COLUMN_MESSAGE_CONTENT = "content";
+    public static final String COLUMN_MESSAGE_TIMESTAMP = "timestamp";
     @Override
     public void onCreate(SQLiteDatabase db) {
         String CREATE_USERS_TABLE = "CREATE TABLE " + TABLE_USERS + "("
@@ -178,6 +185,15 @@ public class DBHelper extends SQLiteOpenHelper {
                 + ")";
         db.execSQL(CREATE_TABLE_ORDER_ITEMS);
 
+        String CREATE_MESSAGE_TABLE = "CREATE TABLE " + TABLE_MESSAGE + "(" +
+                COLUMN_MESSAGE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                COLUMN_MESSAGE_SENDER + " TEXT," +
+                COLUMN_MESSAGE_RECEIVER + " TEXT," +
+                COLUMN_MESSAGE_CONTENT + " TEXT," +
+                COLUMN_MESSAGE_TIMESTAMP + " TEXT" +
+                ")";
+        db.execSQL(CREATE_MESSAGE_TABLE);
+
 
     }
 
@@ -193,6 +209,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER_ITEMS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDERS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGE);
         onCreate(db);
     }
 

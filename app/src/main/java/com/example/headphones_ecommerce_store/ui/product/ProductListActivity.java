@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.headphones_ecommerce_store.DAO.ProductDAO;
 import com.example.headphones_ecommerce_store.R;
 import com.example.headphones_ecommerce_store.adapters.ProductAdapter;
+import com.example.headphones_ecommerce_store.controller.BottomNavHelper;
 import com.example.headphones_ecommerce_store.database.DBHelper;
 import com.example.headphones_ecommerce_store.databinding.ActivityProductListBinding;
 import com.example.headphones_ecommerce_store.model.Product;
@@ -37,7 +38,7 @@ public class ProductListActivity extends AppCompatActivity {
         binding = ActivityProductListBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.toolbar);
-
+        BottomNavHelper.setupBottomNav(this, 0);
         db = new ProductDAO(this);
 
         productList = new ArrayList<>();

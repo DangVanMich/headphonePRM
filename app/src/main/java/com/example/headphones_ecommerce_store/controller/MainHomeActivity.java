@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 public class MainHomeActivity extends AppCompatActivity {
 
@@ -86,7 +87,7 @@ public class MainHomeActivity extends AppCompatActivity {
 //        productList.add(new Product(3, "Jabra Elite 85h", "Jabra", "Chống ồn chủ động, kết nối đa thiết bị", 199.99, "https://m.media-amazon.com/images/I/81XQy2L7WXL._AC_SL1500_.jpg", 2.2f));
 //        productList.add(new Product(4, "Jabra Elite 85h", "Jabra", "Chống ồn chủ động, kết nối đa thiết bị", 199.99, "https://m.media-amazon.com/images/I/81XQy2L7WXL._AC_SL1500_.jpg", 3.5f));
 
-
+        Random random = new Random();
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 Product product = new Product();
@@ -101,7 +102,7 @@ public class MainHomeActivity extends AppCompatActivity {
                 product.setPrice(cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_PRODUCT_PRICE)));
                 product.setThumbnailImageUrl(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRODUCT_THUMBNAIL_IMAGE_URL)));
                 Float raking = cursor.getFloat(cursor.getColumnIndexOrThrow(COLUMN_PRODUCT_AVERAGE_RATING));
-                product.setAverageRating(raking == null ? 1 : raking);
+                product.setAverageRating(raking == 0 ? random.nextInt(5) + 1 : raking);
 
                 productList.add(product);
             } while (cursor.moveToNext());

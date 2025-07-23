@@ -1,21 +1,25 @@
 package com.example.headphones_ecommerce_store.controller;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.headphones_ecommerce_store.R;
 import com.example.headphones_ecommerce_store.ui.auth.LoginActivity;
+import com.example.headphones_ecommerce_store.ui.support.SupportActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    BottomNavigationView bottomNav;
-    LinearLayout optionPersonalInfo, optionOrderHistory, optionLogout;
+    private BottomNavigationView bottomNav;
+    private LinearLayout optionPersonalInfo, optionOrderHistory, optionSupport, optionLogout;
+    private TextView tvUserName, tvUserOccupation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +29,25 @@ public class ProfileActivity extends AppCompatActivity {
 
         setupBottomNav();
 
+        // Initialize UI elements
         optionPersonalInfo = findViewById(R.id.optionPersonalInfo);
+        optionOrderHistory = findViewById(R.id.optionOrderHistory);
+        optionSupport = findViewById(R.id.optionSupport);
+        optionLogout = findViewById(R.id.optionLogout);
+        tvUserName = findViewById(R.id.tvUserName);
+        tvUserOccupation = findViewById(R.id.tvUserOccupation);
+
+        // Lấy tên người dùng từ SharedPreferences
+        SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        String userFullName = prefs.getString("userFullName", "Khách");
+        tvUserName.setText(userFullName);
+
+        // (Tùy chọn) Lấy nghề nghiệp nếu có
+        String userOccupation = prefs.getString("userOccupation", "Người làm tự do");
+        tvUserOccupation.setText(userOccupation);
+
+
+        // Click listeners
         optionPersonalInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -34,7 +56,6 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-        optionOrderHistory = findViewById(R.id.optionOrderHistory);
         optionOrderHistory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -43,18 +64,27 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-        optionLogout = findViewById(R.id.optionLogout);
-        optionLogout.setOnClickListener(new View.OnClickListener() {
+        optionSupport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
+                Intent intent = new Intent(ProfileActivity.this, SupportActivity.class);
                 startActivity(intent);
             }
         });
 
-
-
+        optionLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.clear();
+                editor.apply();
+                Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
+
     private void setupBottomNav() {
         bottomNav = findViewById(R.id.bottomNavigationView);
         bottomNav.setSelectedItemId(R.id.menu_profile);
@@ -67,26 +97,10 @@ public class ProfileActivity extends AppCompatActivity {
                 intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
                 return true;
-
             } else if (itemId == R.id.menu_profile) {
-                // Đã ở profile
                 return true;
-
-//            } else if (itemId == R.id.menu_cart) {
-//                Intent intent = new Intent(ProfileActivity.this, CartActivity.class);
-//                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-//                startActivity(intent);
-//                return true;
-//
-//            } else if (itemId == R.id.menu_map) {
-//                Intent intent = new Intent(ProfileActivity.this, MapActivity.class);
-//                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-//                startActivity(intent);
-//                return true;
             }
-
             return false;
         });
     }
 }
-

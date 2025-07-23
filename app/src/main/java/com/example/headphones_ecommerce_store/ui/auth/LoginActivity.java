@@ -1,13 +1,16 @@
 package com.example.headphones_ecommerce_store.ui.auth;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.headphones_ecommerce_store.database.DBHelper;
 import com.google.android.material.textfield.TextInputEditText;
 import com.example.headphones_ecommerce_store.controller.MainHomeActivity;
@@ -58,6 +61,14 @@ public class LoginActivity extends AppCompatActivity {
                 String fullName = dbHelper.getUserFullName(email, password);
                 if (fullName != null) {
                     Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
+
+                    // Lưu thông tin vào SharedPreferences
+                    SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString("userFullName", fullName);
+                    editor.putString("userEmail", email); // Lưu email để sử dụng sau
+                    editor.apply();
+
                     // Navigate to MainHomeActivity with user name
                     Intent intent = new Intent(LoginActivity.this, MainHomeActivity.class);
                     intent.putExtra("user_full_name", fullName);

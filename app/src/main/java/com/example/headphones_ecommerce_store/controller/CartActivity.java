@@ -1,6 +1,7 @@
 package com.example.headphones_ecommerce_store.controller;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.widget.Button;
@@ -18,7 +19,7 @@ import com.example.headphones_ecommerce_store.R;
 import com.example.headphones_ecommerce_store.adapters.CartAdapter;
 import com.example.headphones_ecommerce_store.database.DBHelper;
 import com.example.headphones_ecommerce_store.models.CartItem;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.example.headphones_ecommerce_store.ui.auth.LoginActivity;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -36,24 +37,33 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartI
 
     private CartDAO cartDAO;
     private OrderDAO orderDAO;
-    private BottomNavigationView bottomNav;
     private CartAdapter cartAdapter;
     private List<CartItem> cartItemList;
+    private long currentUserId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
+        BottomNavHelper.setupBottomNav(this, R.id.menu_cart);
 
         cartDAO = new CartDAO(this);
         orderDAO = new OrderDAO(this);
         cartItemList = new ArrayList<>();
 
+        currentUserId = getCurrentUserId();
+        if (currentUserId == -1) {
+            Toast.makeText(this, "Vui lòng đăng nhập để xem giỏ hàng", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
         setupViews();
         setupRecyclerView();
         loadCartItems();
         setupListeners();
-        setupBottomNav();
     }
 
     private void setupViews() {
@@ -69,7 +79,6 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartI
         tvTotalPrice = findViewById(R.id.tvTotalPrice);
         btnCheckout = findViewById(R.id.btnCheckout);
         cbSelectAll = findViewById(R.id.cbSelectAll);
-        bottomNav = findViewById(R.id.bottomNavigationView);
     }
 
     private void setupRecyclerView() {
@@ -79,8 +88,10 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartI
     }
 
     private void loadCartItems() {
+        if (currentUserId == -1) return;
+
         cartItemList.clear();
-        Cursor cursor = cartDAO.getAllCartItems();
+        Cursor cursor = cartDAO.getAllCartItems(currentUserId);
 
         if (cursor != null && cursor.moveToFirst()) {
             do {
@@ -95,12 +106,11 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartI
         }
 
         cartAdapter.notifyDataSetChanged();
-        onItemSelectionChanged(); // Cập nhật lại trạng thái checkbox và tổng tiền
+        onItemSelectionChanged();
     }
 
     private void setupListeners() {
         btnCheckout.setOnClickListener(v -> {
-            // Lấy danh sách các sản phẩm được chọn
             List<CartItem> selectedItems = cartItemList.stream()
                     .filter(CartItem::isSelected)
                     .collect(Collectors.toList());
@@ -110,24 +120,20 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartI
                 return;
             }
 
-            // Tính tổng tiền
             double total = 0;
             for (CartItem item : selectedItems) {
                 total += item.getPrice() * item.getQuantity();
             }
 
-            // Lưu đơn hàng vào DB
-            boolean success = orderDAO.createOrder(selectedItems, total);
+            boolean success = orderDAO.createOrder(selectedItems, total, currentUserId);
 
             if (success) {
-                // Xóa các sản phẩm đã thanh toán khỏi giỏ hàng
                 for (CartItem item : selectedItems) {
-                    cartDAO.deleteItem(item.getProductId());
+                    cartDAO.deleteItem(item.getProductId(), currentUserId);
                 }
 
                 NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
 
-                // Tạo tóm tắt đơn hàng để gửi đi
                 StringBuilder summary = new StringBuilder();
                 for (CartItem item : selectedItems) {
                     summary.append(item.getName())
@@ -135,7 +141,6 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartI
                             .append("\n\n");
                 }
 
-                // Chuyển đến màn hình thành công
                 Intent intent = new Intent(CartActivity.this, PaymentSuccessActivity.class);
                 intent.putExtra("EXTRA_ORDER_ID", String.valueOf(System.currentTimeMillis()));
                 intent.putExtra("EXTRA_TOTAL_AMOUNT", currencyFormatter.format(total));
@@ -161,7 +166,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartI
     private void calculateTotalPrice() {
         double total = 0;
         for (CartItem item : cartItemList) {
-            if (item.isSelected()) { // Chỉ tính tổng các item được chọn
+            if (item.isSelected()) {
                 total += item.getPrice() * item.getQuantity();
             }
         }
@@ -169,26 +174,39 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartI
         tvTotalPrice.setText(currencyFormatter.format(total));
     }
 
+    private long getCurrentUserId() {
+        SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        String email = prefs.getString("userEmail", null);
+        if (email != null) {
+            DBHelper dbHelper = new DBHelper(this);
+            return dbHelper.getUserIdByEmail(email);
+        }
+        return -1;
+    }
+
     @Override
     public void onQuantityChanged(CartItem item) {
-        cartDAO.updateQuantity(item.getProductId(), item.getQuantity());
-        calculateTotalPrice();
+        if (currentUserId != -1) {
+            cartDAO.updateQuantity(item.getProductId(), item.getQuantity(), currentUserId);
+            calculateTotalPrice();
+        }
     }
 
     @Override
     public void onItemDeleted(CartItem item, int position) {
-        cartDAO.deleteItem(item.getProductId());
-        cartItemList.remove(position);
-        cartAdapter.notifyItemRemoved(position);
-        cartAdapter.notifyItemRangeChanged(position, cartItemList.size());
-        calculateTotalPrice();
-        Toast.makeText(this, "Đã xóa sản phẩm", Toast.LENGTH_SHORT).show();
+        if (currentUserId != -1) {
+            cartDAO.deleteItem(item.getProductId(), currentUserId);
+            cartItemList.remove(position);
+            cartAdapter.notifyItemRemoved(position);
+            cartAdapter.notifyItemRangeChanged(position, cartItemList.size());
+            calculateTotalPrice();
+            Toast.makeText(this, "Đã xóa sản phẩm", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
     public void onItemSelectionChanged() {
         calculateTotalPrice();
-        // Kiểm tra xem có phải tất cả item đều được chọn không
         boolean allChecked = !cartItemList.isEmpty();
         for (CartItem item : cartItemList) {
             if (!item.isSelected()) {
@@ -196,30 +214,8 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.CartI
                 break;
             }
         }
-        // Cập nhật checkbox "Chọn tất cả" mà không kích hoạt lại listener của nó
         if (cbSelectAll.isChecked() != allChecked) {
             cbSelectAll.setChecked(allChecked);
         }
-    }
-    private void setupBottomNav() {
-        bottomNav.setSelectedItemId(R.id.menu_cart); // Đánh dấu mục Giỏ hàng là đang được chọn
-
-        bottomNav.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.menu_home) {
-                Intent intent = new Intent(this, MainHomeActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                return true;
-            } else if (itemId == R.id.menu_cart) {
-                // Đã ở màn hình Giỏ hàng, không làm gì
-                return true;
-            } else if (itemId == R.id.menu_profile) {
-                Intent intent = new Intent(this, ProfileActivity.class); // Giả sử có ProfileActivity
-                startActivity(intent);
-                return true;
-            }
-            return false;
-        });
     }
 }

@@ -1,8 +1,10 @@
 package com.example.headphones_ecommerce_store.controller;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -13,8 +15,10 @@ import androidx.appcompat.widget.Toolbar;
 import com.bumptech.glide.Glide;
 import com.example.headphones_ecommerce_store.DAO.CartDAO;
 import com.example.headphones_ecommerce_store.R;
+import com.example.headphones_ecommerce_store.database.DBHelper;
 import com.example.headphones_ecommerce_store.model.Product;
 import com.example.headphones_ecommerce_store.repository.ProductRepository;
+import com.example.headphones_ecommerce_store.ui.auth.LoginActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.text.NumberFormat;
@@ -30,7 +34,6 @@ public class ProductDetailActivity extends AppCompatActivity {
     private Button btnBuyNow;
     private Toolbar toolbar;
     private CartDAO cartDAO;
-    private BottomNavigationView bottomNav;
     private ProductRepository productRepository;
 
     private Product currentProduct;
@@ -47,9 +50,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         setupToolbar();
         loadProductDetails();
         setupClickListeners();
-        setupBottomNav();
     }
-
     private void setupViews() {
         toolbar = findViewById(R.id.toolbar);
         ivDetailProductImage = findViewById(R.id.ivDetailProductImage);
@@ -61,7 +62,6 @@ public class ProductDetailActivity extends AppCompatActivity {
         ivPlus = findViewById(R.id.ivPlus);
         ivAddToCart = findViewById(R.id.ivAddToCart);
         btnBuyNow = findViewById(R.id.btnBuyNow);
-        bottomNav = findViewById(R.id.bottomNavigationView);
     }
 
     private void setupToolbar() {
@@ -98,33 +98,25 @@ public class ProductDetailActivity extends AppCompatActivity {
                 .load(product.getThumbnailImageUrl())
                 .placeholder(R.drawable.ic_menu_gallery)
                 .error(R.mipmap.ic_launcher)
-                .fitCenter() // Đảm bảo hiển thị toàn bộ ảnh
+                .fitCenter()
                 .into(ivDetailProductImage);
     }
 
-    private void setupBottomNav() {
-        // Bỏ chọn tất cả các mục để không có mục nào được highlight
-        bottomNav.getMenu().setGroupCheckable(0, false, true);
-
-        bottomNav.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.menu_home) {
-                Intent intent = new Intent(this, MainHomeActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                return true;
-            } else if (itemId == R.id.menu_cart) {
-                Intent intent = new Intent(this, CartActivity.class);
-                startActivity(intent);
-                return true;
-            } else if (itemId == R.id.menu_profile) {
-                Intent intent = new Intent(this, ProfileActivity.class); // Giả sử có ProfileActivity
-                startActivity(intent);
-                return true;
-            }
-            return false;
-        });
+    private boolean isUserLoggedIn() {
+        SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        return prefs.getString("userEmail", null) != null;
     }
+
+    private long getCurrentUserId() {
+        SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        String email = prefs.getString("userEmail", null);
+        if (email != null) {
+            DBHelper dbHelper = new DBHelper(this);
+            return dbHelper.getUserIdByEmail(email);
+        }
+        return -1;
+    }
+
 
     private void setupClickListeners() {
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
@@ -143,33 +135,47 @@ public class ProductDetailActivity extends AppCompatActivity {
             }
         });
 
-        //long productId = getIntent().getLongExtra(EXTRA_PRODUCT_ID, -1);
+        //<====BẮT ĐẦU SỬA====>
         ivAddToCart.setOnClickListener(v -> {
-            if (currentProduct != null) {
-                cartDAO.addToCart(currentProduct.getId(), quantity);
-                Toast.makeText(this, "Đã thêm vào giỏ hàng!", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(ProductDetailActivity.this, CartActivity.class);
-                startActivity(intent);
+            if (isUserLoggedIn()) {
+                long userId = getCurrentUserId();
+                if (userId != -1 && currentProduct != null) {
+                    cartDAO.addToCart(currentProduct.getId(), quantity, userId);
+                    Toast.makeText(this, "Đã thêm vào giỏ hàng!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(ProductDetailActivity.this, CartActivity.class);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(this, "Lỗi: Không tìm thấy sản phẩm hoặc người dùng", Toast.LENGTH_SHORT).show();
+                }
             } else {
-                Toast.makeText(this, "Lỗi: Không tìm thấy sản phẩm", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Vui lòng đăng nhập để thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(ProductDetailActivity.this, LoginActivity.class);
+                startActivity(intent);
             }
         });
 
         btnBuyNow.setOnClickListener(v -> {
-            if (currentProduct != null) {
-                String orderId = String.valueOf(System.currentTimeMillis());
-                NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
-                String totalAmount = currencyFormatter.format(currentProduct.getPrice() * quantity);
-                String summary = currentProduct.getName() + "\nSố lượng: " + quantity;
+            if (isUserLoggedIn()) {
+                if (currentProduct != null) {
+                    String orderId = String.valueOf(System.currentTimeMillis());
+                    NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+                    String totalAmount = currencyFormatter.format(currentProduct.getPrice() * quantity);
+                    String summary = currentProduct.getName() + "\nSố lượng: " + quantity;
 
-                Intent intent = new Intent(ProductDetailActivity.this, PaymentSuccessActivity.class);
-                intent.putExtra("EXTRA_ORDER_ID", orderId);
-                intent.putExtra("EXTRA_TOTAL_AMOUNT", totalAmount);
-                intent.putExtra("EXTRA_ORDER_SUMMARY", summary);
-                startActivity(intent);
+                    Intent intent = new Intent(ProductDetailActivity.this, PaymentSuccessActivity.class);
+                    intent.putExtra("EXTRA_ORDER_ID", orderId);
+                    intent.putExtra("EXTRA_TOTAL_AMOUNT", totalAmount);
+                    intent.putExtra("EXTRA_ORDER_SUMMARY", summary);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(this, "Lỗi: Không tìm thấy sản phẩm", Toast.LENGTH_SHORT).show();
+                }
             } else {
-                Toast.makeText(this, "Lỗi: Không tìm thấy sản phẩm", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Vui lòng đăng nhập để mua hàng", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(ProductDetailActivity.this, LoginActivity.class);
+                startActivity(intent);
             }
         });
+        //<====KẾT THÚC SỬA====>
     }
 }

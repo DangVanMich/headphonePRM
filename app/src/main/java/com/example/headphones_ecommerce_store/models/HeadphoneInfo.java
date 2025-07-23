@@ -9,6 +9,7 @@ public class HeadphoneInfo implements Serializable {
     private String imageUrl;
 
     public HeadphoneInfo(long id, String name, String brand, double price, String imageUrl) {
+        this.id = id;
         this.name = name;
         this.brand = brand;
         this.price = price;

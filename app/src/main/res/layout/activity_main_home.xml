@@ -19,6 +19,7 @@
 
             <!-- Chào người dùng -->
             <TextView
+                android:id="@+id/tvGreeting"
                 android:text="Chào, Nguyễn Văn A"
                 android:textStyle="bold"
                 android:textSize="18sp"
@@ -44,7 +45,6 @@
                     android:src="@android:drawable/ic_menu_search" />
 
                 <EditText
-                    android:id="@+id/searchEditText"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"

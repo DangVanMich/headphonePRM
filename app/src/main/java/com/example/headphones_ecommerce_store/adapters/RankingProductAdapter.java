@@ -1,6 +1,7 @@
 package com.example.headphones_ecommerce_store.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,19 +14,26 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.headphones_ecommerce_store.R;
 import com.example.headphones_ecommerce_store.model.Product;
+import com.example.headphones_ecommerce_store.models.RankingFragment;
 
 import java.util.List;
 
 public class RankingProductAdapter extends RecyclerView.Adapter<RankingProductAdapter.ViewHolder> {
-    private final List<Product> productList;
-    private final Context context;
+    private  List<Product> productList;
+    private  Context context;
+    private OnItemClickListener listener;
 
-    public RankingProductAdapter(Context context, List<Product> productList) {
-        this.context = context;
-        this.productList = productList;
+    public interface OnItemClickListener {
+        void onItemClick(Product item);
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public RankingProductAdapter(Context context, List<Product> productList, OnItemClickListener listener) {
+        this.context = context;
+        this.productList = productList;
+        this.listener = listener;
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imgProduct;
         TextView txtName, txtPrice, txtRating;
 
@@ -35,6 +43,14 @@ public class RankingProductAdapter extends RecyclerView.Adapter<RankingProductAd
             txtName = itemView.findViewById(R.id.txtProductName);
             txtPrice = itemView.findViewById(R.id.txtProductPrice);
             txtRating = itemView.findViewById(R.id.txtProductRating);
+
+            itemView.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (listener != null && position != RecyclerView.NO_POSITION) {
+                    Log.d("AdapterClick", "RankingAdapter: Item clicked at position " + position);
+                    listener.onItemClick(productList.get(position));
+                }
+            });
         }
     }
 

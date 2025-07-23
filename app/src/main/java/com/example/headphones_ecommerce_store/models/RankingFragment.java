@@ -1,6 +1,8 @@
 package com.example.headphones_ecommerce_store.models;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +14,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.headphones_ecommerce_store.R;
+import com.example.headphones_ecommerce_store.adapters.HeadphoneAdapter;
 import com.example.headphones_ecommerce_store.adapters.RankingProductAdapter;
+import com.example.headphones_ecommerce_store.controller.MainHomeActivity;
+import com.example.headphones_ecommerce_store.controller.ProductDetailActivity;
 import com.example.headphones_ecommerce_store.model.Product;
 
 import java.util.ArrayList;
@@ -50,8 +55,16 @@ public class RankingFragment extends Fragment {
                 .limit(3)
                 .collect(Collectors.toList());
 
+            RankingProductAdapter adapter = new RankingProductAdapter(getContext(), filteredTop3, product -> {
 
-        RankingProductAdapter adapter = new RankingProductAdapter(getContext(), filteredTop3);
+            Intent intent = new Intent(getActivity(), ProductDetailActivity.class);
+            // Chỉ gửi ID của sản phẩm
+            intent.putExtra(ProductDetailActivity.EXTRA_PRODUCT_ID, product.getId());
+
+            startActivity(intent);
+        });
+
+
         recyclerView.setAdapter(adapter);
 
         return view;

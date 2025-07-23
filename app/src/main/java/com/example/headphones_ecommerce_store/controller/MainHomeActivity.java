@@ -99,8 +99,12 @@ public class MainHomeActivity extends AppCompatActivity {
 
         // bấm vào sản phẩm (đổi model r)
         adapter = new HeadphoneAdapter(this, filteredProducts, product -> {
-            Log.d("MainHomeClick", "Clicked on: " + product.getName());
+            Log.d("MainHomeClick", "Clicked on: " + product.getName() + " with ID: " + product.getId());
+
             Intent intent = new Intent(MainHomeActivity.this, ProductDetailActivity.class);
+
+            // Chỉ gửi ID của sản phẩm
+            intent.putExtra(ProductDetailActivity.EXTRA_PRODUCT_ID, product.getId());
             //intent.putExtra(ProductDetailActivity.EXTRA_PRODUCT_OBJECT, product);
             startActivity(intent);
         });
@@ -167,3 +171,4 @@ public class MainHomeActivity extends AppCompatActivity {
     }
 
 }
+

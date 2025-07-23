@@ -68,6 +68,21 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String COLUMN_CART_PRODUCT_ID = "product_id";
     public static final String COLUMN_CART_QUANTITY = "quantity";
 
+    // Orders Table
+    public static final String TABLE_ORDERS = "orders";
+    public static final String COLUMN_ORDER_ID = "order_id";
+    public static final String COLUMN_ORDER_DATE = "order_date";
+    public static final String COLUMN_ORDER_TOTAL = "total_amount";
+    public static final String COLUMN_ORDER_STATUS = "status";
+
+    // Order Items Table
+    public static final String TABLE_ORDER_ITEMS = "order_items";
+    public static final String COLUMN_ORDER_ITEM_ID = "item_id";
+    public static final String COLUMN_ORDER_ITEM_ORDER_ID = "order_id";
+    public static final String COLUMN_ORDER_ITEM_PRODUCT_NAME = "product_name";
+    public static final String COLUMN_ORDER_ITEM_QUANTITY = "quantity";
+    public static final String COLUMN_ORDER_ITEM_PRICE = "price";
+
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -146,9 +161,25 @@ public class DBHelper extends SQLiteOpenHelper {
                 + ")";
         db.execSQL(CREATE_TABLE_CART);
 
+        String CREATE_TABLE_ORDERS = "CREATE TABLE " + TABLE_ORDERS + "("
+                + COLUMN_ORDER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + COLUMN_ORDER_DATE + " TEXT,"
+                + COLUMN_ORDER_TOTAL + " REAL,"
+                + COLUMN_ORDER_STATUS + " TEXT" + ")";
+        db.execSQL(CREATE_TABLE_ORDERS);
+
+        String CREATE_TABLE_ORDER_ITEMS = "CREATE TABLE " + TABLE_ORDER_ITEMS + "("
+                + COLUMN_ORDER_ITEM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + COLUMN_ORDER_ITEM_ORDER_ID + " INTEGER,"
+                + COLUMN_ORDER_ITEM_PRODUCT_NAME + " TEXT,"
+                + COLUMN_ORDER_ITEM_QUANTITY + " INTEGER,"
+                + COLUMN_ORDER_ITEM_PRICE + " REAL,"
+                + "FOREIGN KEY (" + COLUMN_ORDER_ITEM_ORDER_ID + ") REFERENCES " + TABLE_ORDERS + "(" + COLUMN_ORDER_ID + ")"
+                + ")";
+        db.execSQL(CREATE_TABLE_ORDER_ITEMS);
+
+
     }
-
-
 
 
     @Override
@@ -160,7 +191,109 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PRODUCT_IMAGE_URLS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PRODUCTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CART);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER_ITEMS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDERS);
         onCreate(db);
+    }
+
+    // Add user to database
+    public long addUser(String fullName, String email, String password) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_USER_FULLNAME, fullName);
+        values.put(COLUMN_USER_EMAIL, email);
+        values.put(COLUMN_USER_PASSWORD, password); // Note: In production, hash the password
+
+        long result = db.insert(TABLE_USERS, null, values);
+        db.close();
+        return result;
+    }
+
+    // Check user credentials
+    public boolean checkUser(String email, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] columns = {COLUMN_USER_ID};
+        String selection = COLUMN_USER_EMAIL + " = ? AND " + COLUMN_USER_PASSWORD + " = ?";
+        String[] selectionArgs = {email, password};
+
+        Cursor cursor = db.query(TABLE_USERS, columns, selection, selectionArgs, null, null, null);
+        int count = cursor.getCount();
+        cursor.close();
+        db.close();
+        return count > 0;
+    }
+
+    // Get user full name
+    public String getUserFullName(String email, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] columns = {COLUMN_USER_FULLNAME};
+        String selection = COLUMN_USER_EMAIL + " = ? AND " + COLUMN_USER_PASSWORD + " = ?";
+        String[] selectionArgs = {email, password};
+
+        Cursor cursor = db.query(TABLE_USERS, columns, selection, selectionArgs, null, null, null);
+        String fullName = null;
+        if (cursor.moveToFirst()) {
+            fullName = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_FULLNAME));
+        }
+        cursor.close();
+        db.close();
+        return fullName;
+    }
+    // In DBHelper.java
+
+
+    // Check if email exists
+    public boolean isEmailExists(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] columns = {COLUMN_USER_ID};
+        String selection = COLUMN_USER_EMAIL + " = ? COLLATE NOCASE"; // Case-insensitive matching
+        String[] selectionArgs = {email.trim()};
+
+        Cursor cursor = db.query(TABLE_USERS, columns, selection, selectionArgs, null, null, null);
+        int count = cursor.getCount();
+        System.out.println("isEmailExists: Email " + email + " found count: " + count); // Debug log
+        cursor.close();
+        db.close();
+        return count > 0;
+    }
+
+    // Update user password
+    public boolean updatePassword(String email, String newPassword) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_USER_PASSWORD, newPassword);
+
+        String whereClause = COLUMN_USER_EMAIL + " = ?";
+        String[] whereArgs = {email};
+
+        int rowsAffected = db.update(TABLE_USERS, values, whereClause, whereArgs);
+        db.close();
+        return rowsAffected > 0;
+    }
+
+    // Get full user details by email
+    public User getUserByEmail(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] columns = {COLUMN_USER_ID, COLUMN_USER_FULLNAME, COLUMN_USER_EMAIL, COLUMN_USER_PASSWORD};
+        String selection = COLUMN_USER_EMAIL + " = ? COLLATE NOCASE";
+        String[] selectionArgs = {email.trim()};
+
+        Cursor cursor = db.query(TABLE_USERS, columns, selection, selectionArgs, null, null, null);
+        User user = null;
+        if (cursor.moveToFirst()) {
+            user = new User();
+            user.setId(String.valueOf(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_USER_ID))));
+            user.setDisplayName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_FULLNAME))); // Assuming displayName = fullName
+            user.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_EMAIL)));
+            user.setPassword(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_USER_PASSWORD)));
+            // Placeholder for missing fields (to be implemented with additional tables)
+            user.setProfileImageUrl(null); // Add table for profile images if needed
+            user.setShippingAddresses(null); // Add shipping_addresses table
+            user.setPaymentMethods(null); // Add payment_methods table
+            user.setOrderHistory(null); // Add orders table
+        }
+        cursor.close();
+        db.close();
+        return user;
     }
 }

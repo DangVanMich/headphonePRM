@@ -17,32 +17,22 @@ public class OrderDAO extends DBHelper {
         super(context);
     }
 
-    //<====BẮT ĐẦU SỬA====>
-    /**
-     * Tạo đơn hàng mới cho một người dùng cụ thể.
-     * @param items Danh sách các sản phẩm trong đơn hàng.
-     * @param total Tổng giá trị đơn hàng.
-     * @param userId ID của người dùng đặt hàng.
-     * @return true nếu tạo đơn hàng thành công.
-     */
     public boolean createOrder(List<CartItem> items, double total, long userId) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.beginTransaction();
         try {
-            // 1. Thêm vào bảng orders
             ContentValues orderValues = new ContentValues();
             String currentDate = new SimpleDateFormat("dd/MM/yyyy, HH:mm", Locale.getDefault()).format(new Date());
             orderValues.put(COLUMN_ORDER_DATE, currentDate);
             orderValues.put(COLUMN_ORDER_TOTAL, total);
             orderValues.put(COLUMN_ORDER_STATUS, "Hoàn thành");
-            orderValues.put(COLUMN_ORDER_USER_ID, userId); // Thêm user ID vào đơn hàng
+            orderValues.put(COLUMN_ORDER_USER_ID, userId);
 
             long orderId = db.insertOrThrow(TABLE_ORDERS, null, orderValues);
             if (orderId == -1) {
                 return false;
             }
 
-            // 2. Thêm vào bảng order_items
             for (CartItem item : items) {
                 ContentValues itemValues = new ContentValues();
                 itemValues.put(COLUMN_ORDER_ITEM_ORDER_ID, orderId);
@@ -62,23 +52,10 @@ public class OrderDAO extends DBHelper {
         }
     }
 
-    /**
-     * Lấy tất cả đơn hàng của một người dùng cụ thể.
-     * @param userId ID của người dùng.
-     * @return Cursor chứa danh sách đơn hàng.
-     */
     public Cursor getAllOrders(long userId) {
         SQLiteDatabase db = this.getReadableDatabase();
-        // Sắp xếp để đơn hàng mới nhất lên đầu và lọc theo user ID
         return db.query(TABLE_ORDERS, null, COLUMN_ORDER_USER_ID + " = ?", new String[]{String.valueOf(userId)}, null, null, COLUMN_ORDER_ID + " DESC");
     }
-    //<====KẾT THÚC SỬA====>
-
-    /**
-     * Lấy tất cả các sản phẩm thuộc một đơn hàng cụ thể.
-     * @param orderId ID của đơn hàng.
-     * @return Cursor chứa danh sách sản phẩm.
-     */
     public Cursor getOrderItems(long orderId) {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.query(TABLE_ORDER_ITEMS, null, COLUMN_ORDER_ITEM_ORDER_ID + " = ?", new String[]{String.valueOf(orderId)}, null, null, null);

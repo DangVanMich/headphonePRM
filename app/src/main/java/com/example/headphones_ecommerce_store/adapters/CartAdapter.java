@@ -80,7 +80,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
 
             Glide.with(context).load(item.getImageUrl()).into(ivCartProductImage);
 
-            // Bỏ listener cũ để tránh gọi 2 lần, chỉ xử lý khi người dùng nhấn
             cbSelectItem.setOnCheckedChangeListener(null);
             cbSelectItem.setChecked(item.isSelected());
             cbSelectItem.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -90,7 +89,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                 }
             });
 
-            // Sự kiện tăng số lượng
             ivCartPlus.setOnClickListener(v -> {
                 int quantity = item.getQuantity();
                 quantity++;
@@ -99,7 +97,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                 listener.onQuantityChanged(item);
             });
 
-            // Sự kiện giảm số lượng
             ivCartMinus.setOnClickListener(v -> {
                 int quantity = item.getQuantity();
                 if (quantity > 1) {
@@ -110,7 +107,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
                 }
             });
 
-            // Sự kiện xóa sản phẩm
             ivDeleteItem.setOnClickListener(v -> {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION) {

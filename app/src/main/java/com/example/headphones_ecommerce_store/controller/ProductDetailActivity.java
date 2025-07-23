@@ -14,14 +14,17 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.example.headphones_ecommerce_store.DAO.CartDAO;
+import com.example.headphones_ecommerce_store.DAO.OrderDAO;
 import com.example.headphones_ecommerce_store.R;
 import com.example.headphones_ecommerce_store.database.DBHelper;
 import com.example.headphones_ecommerce_store.model.Product;
+import com.example.headphones_ecommerce_store.models.CartItem;
 import com.example.headphones_ecommerce_store.repository.ProductRepository;
 import com.example.headphones_ecommerce_store.ui.auth.LoginActivity;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class ProductDetailActivity extends AppCompatActivity {
@@ -34,6 +37,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     private Button btnBuyNow;
     private Toolbar toolbar;
     private CartDAO cartDAO;
+    private OrderDAO orderDAO;
     private ProductRepository productRepository;
 
     private Product currentProduct;
@@ -45,6 +49,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         BottomNavHelper.setupBottomNav(this, 0);
         cartDAO = new CartDAO(this);
         productRepository = new ProductRepository(this);
+        orderDAO = new OrderDAO(this);
 
         setupViews();
         setupToolbar();
@@ -135,7 +140,7 @@ public class ProductDetailActivity extends AppCompatActivity {
             }
         });
 
-        //<====BẮT ĐẦU SỬA====>
+
         ivAddToCart.setOnClickListener(v -> {
             if (isUserLoggedIn()) {
                 long userId = getCurrentUserId();
@@ -156,17 +161,28 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         btnBuyNow.setOnClickListener(v -> {
             if (isUserLoggedIn()) {
-                if (currentProduct != null) {
-                    String orderId = String.valueOf(System.currentTimeMillis());
-                    NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
-                    String totalAmount = currencyFormatter.format(currentProduct.getPrice() * quantity);
-                    String summary = currentProduct.getName() + "\nSố lượng: " + quantity;
+                long userId = getCurrentUserId();
+                if (userId != -1 && currentProduct != null) {
+                    List<CartItem> itemsToOrder = new ArrayList<>();
+                    itemsToOrder.add(new CartItem(currentProduct.getId(), currentProduct.getName(), currentProduct.getPrice(), currentProduct.getThumbnailImageUrl(), quantity));
 
-                    Intent intent = new Intent(ProductDetailActivity.this, PaymentSuccessActivity.class);
-                    intent.putExtra("EXTRA_ORDER_ID", orderId);
-                    intent.putExtra("EXTRA_TOTAL_AMOUNT", totalAmount);
-                    intent.putExtra("EXTRA_ORDER_SUMMARY", summary);
-                    startActivity(intent);
+                    double total = currentProduct.getPrice() * quantity;
+                    boolean success = orderDAO.createOrder(itemsToOrder, total, userId);
+
+                    if (success) {
+                        String orderId = String.valueOf(System.currentTimeMillis());
+                        NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+                        String totalAmount = currencyFormatter.format(total);
+                        String summary = currentProduct.getName() + "\nSố lượng: " + quantity;
+
+                        Intent intent = new Intent(ProductDetailActivity.this, PaymentSuccessActivity.class);
+                        intent.putExtra("EXTRA_ORDER_ID", orderId);
+                        intent.putExtra("EXTRA_TOTAL_AMOUNT", totalAmount);
+                        intent.putExtra("EXTRA_ORDER_SUMMARY", summary);
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(this, "Tạo đơn hàng thất bại!", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     Toast.makeText(this, "Lỗi: Không tìm thấy sản phẩm", Toast.LENGTH_SHORT).show();
                 }
@@ -176,6 +192,5 @@ public class ProductDetailActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        //<====KẾT THÚC SỬA====>
     }
 }

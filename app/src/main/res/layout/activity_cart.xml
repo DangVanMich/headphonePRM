@@ -21,13 +21,24 @@
             app:navigationIcon="@drawable/ic_arrow_back"/>
     </com.google.android.material.appbar.AppBarLayout>
 
+    <!--<====BẮt đầu sửa====>-->
+    <!-- Thêm BottomNavigationView vào cuối -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        app:menu="@menu/bottom_nav_menu" />
+
+    <!-- Thanh tổng tiền và thanh toán -->
     <LinearLayout
         android:id="@+id/bottom_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_alignParentBottom="true"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:layout_above="@id/bottomNavigationView">
+        <!-- <====Kết thúc sửa====>-->
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
@@ -65,12 +76,15 @@
             android:layout_marginTop="12dp"/>
     </LinearLayout>
 
+    <!--<====BẮt đầu sửa====>-->
+    <!-- Nội dung chính sẽ nằm giữa Toolbar và thanh tổng tiền -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/appBarLayout"
         android:layout_above="@id/bottom_bar"
         android:padding="16dp">
+        <!-- <====Kết thúc sửa====>-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
